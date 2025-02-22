@@ -477,7 +477,7 @@ def sort_breakdown_box():
     breakdown_box.config(state=tk.DISABLED)
 
 
-def analyze_votes_gui(PLAYER_DATA_FILE):
+def analyze_votes_gui(PLAYER_DATA_FILE,entry_link):
     reddit_link = entry_link.get()  # Get the Reddit link from the input box
 
     # Load player data from the fixed player file
@@ -536,7 +536,7 @@ def main():
     open_posts_button.grid(row=0, column=1, padx=10, pady=(0, 5))  # Position the button below the entry
 
     # Button to trigger analysis
-    analyze_button = tk.Button(root, text="Analyze Votes", command=lambda:analyze_votes_gui(PLAYER_DATA_FILE))
+    analyze_button = tk.Button(root, text="Analyze Votes", command=lambda:analyze_votes_gui(PLAYER_DATA_FILE,entry_link))
     analyze_button.grid(row=2, column=0, padx=10, pady=(0, 10))  # Position the button below the previous button
 
     # Text area for displaying the breakdown
