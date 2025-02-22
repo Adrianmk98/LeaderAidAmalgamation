@@ -29,14 +29,14 @@ def load_encrypted_json():
 #Loads list of old players for votes which take place with a different set of MPs than the current
 def load_old_players():
     try:
-        with open('players.txt', 'r') as f:
+        with open('playerFiles/players.txt', 'r') as f:
             return set(f.read().splitlines())
     except FileNotFoundError:
         return set()
 
 #Any removed players from players.txt are added to the oldplayer.txt file
 def update_oldplayers_file(removed_players):
-    with open('oldplayer.txt', 'a') as f:
+    with open('playerFiles/oldplayer.txt', 'a') as f:
         for player in removed_players:
             f.write(player + "\n")
 
@@ -74,7 +74,7 @@ def playerUpdater():
     removed_players = set(old_players) - set(new_players)
 
     # Update players.txt with ordered new players
-    with open('players.txt', 'w') as f:
+    with open('playerFiles/players.txt', 'w') as f:
         f.write("\n".join(new_players))
 
     # Update oldplayer.txt with removed players

@@ -20,7 +20,7 @@ def fetch_reddit_creds():
     config = configparser.ConfigParser()
 
     try:
-        files_read = config.read('config.ini')
+        files_read = config.read('config/config.ini')
         if 'reddit' not in config:
             raise ValueError("Missing 'reddit' section in config.ini")
 
@@ -59,7 +59,7 @@ user_found = {}
 # Function to read usernames from names.txt and filter out "Vacant" and "Party List MP Party" lines
 def load_usernames_and_parties():
     users_and_parties = []
-    with open("players.txt", 'r') as file:
+    with open("playerFiles/players.txt", 'r') as file:
         for line in file:
             clean_line = line.strip()
             # Skip empty lines or lines with "vacant" in any field
@@ -182,7 +182,7 @@ def main():
     rootx.withdraw()
     root = tk.Toplevel()
     root.title("CMHoC Activity Checker")
-    logo = tk.PhotoImage(file="logoorange.png")
+    logo = tk.PhotoImage(file="activityChecker/logoorange.png")
     root.iconphoto(True, logo)
     tk.Label(root, text="Start Date:").grid(row=0, column=0, padx=10, pady=5)
     calendar_start = DateEntry(root, width=12, background='darkblue', foreground='white', borderwidth=2)

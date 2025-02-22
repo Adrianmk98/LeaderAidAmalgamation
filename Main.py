@@ -1,7 +1,7 @@
 import tkinter as tk
-import activitycheckMain
-import voteanalyzerMain
-import commentreaderMain
+from ActivityChecker import activitycheckMain
+from VoteAnalyzer import voteanalyzerMain
+from CommentReader import commentreaderMain
 from tkinter import PhotoImage
 '''
 
