@@ -506,8 +506,8 @@ def analyze_votes_gui(PLAYER_DATA_FILE):
     display_vote_breakdown(final_votes, all_votes, player_data, vacant_count, submission)
 
 def main():
-    global label_link,entry_link,open_posts_button,analyze_button,breakdown_box
-    global tally_box,sort_button,sort_party_button,window,reddit,root
+    global entry_link,breakdown_box
+    global tally_box,window,reddit,root
     # Fixed player data file (adjust the file path accordingly)
     config = configparser.ConfigParser()
     files_read = config.read('config/locationOfTxt.ini')
