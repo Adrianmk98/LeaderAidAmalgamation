@@ -1,8 +1,11 @@
 import tkinter as tk
-from ActivityChecker import activitycheckMain
+from activityChecker import activitycheckMain
 from VoteAnalyzer import voteanalyzerMain
-from CommentReader import commentreaderMain
+from commentReader import commentreaderMain
 from tkinter import PhotoImage
+
+from dropDown.helpWindow import MainHelpWindow
+
 '''
 
  Program Purpose: Front end of the application. Allows the user to navigate to the option they wish to use.
@@ -26,9 +29,14 @@ def open_playerupdater():
 # Create the main window
 root = tk.Tk()
 root.title("Dashboard")
-root.geometry("300x200")
-logo = PhotoImage(file="logored.png")
+root.geometry("300x250")
+logo = PhotoImage(file="logos/logored.png")
 root.iconphoto(False, logo)
+menu_bar = tk.Menu(root)
+root.config(menu=menu_bar)
+drop_menu = tk.Menu(menu_bar, tearoff=0)
+menu_bar.add_cascade(label="File", menu=drop_menu)
+drop_menu.add_command(label="Help", command=lambda: MainHelpWindow(root))
 
 btn_activitycheck = tk.Button(root, text="Open Activity Check", command=open_activitycheck)
 btn_activitycheck.pack(pady=10)
