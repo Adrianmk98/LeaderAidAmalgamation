@@ -9,36 +9,15 @@ import webbrowser
 import tkinter as tk
 import pyperclip
 
+from dropDown.helpWindow import ActivityCheckHelpWindow
+from config.getRedditCreds import fetch_reddit_creds
+
 '''
 
  Program Purpose: Creates a gui which allows for input of a start date, and end date for the comment search. 
  The reddit API will search all posts in the indicated subreddit with certain flairs in order to determine which players from players.txt have sufficient activity.
 
  '''
-#Gets information for the reddit API bot using config.ini and makes sure that the information is correct
-def fetch_reddit_creds():
-    config = configparser.ConfigParser()
-
-    try:
-        files_read = config.read('config/config.ini')
-        if 'reddit' not in config:
-            raise ValueError("Missing 'reddit' section in config.ini")
-
-        # Ensure all necessary keys exist in the 'reddit' section
-        required_keys = ['client_id', 'client_secret', 'user_agent']
-        for key in required_keys:
-            if key not in config['reddit']:
-                raise ValueError(f"Missing '{key}' in 'reddit' section of config.ini")
-
-        reddit=praw.Reddit(client_id=config['reddit']['client_id'],
-                           client_secret=config['reddit']['client_secret'],
-                           user_agent=config['reddit']['user_agent'])
-        return reddit
-
-    except FileNotFoundError:
-        raise FileNotFoundError("config.ini file not found. Please ensure it exists in the correct directory.")
-    except ValueError as ve:
-        raise ValueError(f"Configuration error: {ve}")
 
 # List of specific flairs to check in cmhoc since any other flairs do not qualify
 TARGET_FLAIRS = [
@@ -182,8 +161,13 @@ def main():
     rootx.withdraw()
     root = tk.Toplevel()
     root.title("CMHoC Activity Checker")
-    logo = tk.PhotoImage(file="activityChecker/logoorange.png")
+    logo = tk.PhotoImage(file="logos/logoorange.png")
     root.iconphoto(True, logo)
+    menu_bar = tk.Menu(root)
+    root.config(menu=menu_bar)
+    drop_menu = tk.Menu(menu_bar, tearoff=0)
+    menu_bar.add_cascade(label="File", menu=drop_menu)
+    drop_menu.add_command(label="Help", command=lambda: ActivityCheckHelpWindow(root))
     tk.Label(root, text="Start Date:").grid(row=0, column=0, padx=10, pady=5)
     calendar_start = DateEntry(root, width=12, background='darkblue', foreground='white', borderwidth=2)
     calendar_start.grid(row=0, column=1, padx=10, pady=5)
