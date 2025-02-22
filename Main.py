@@ -7,7 +7,6 @@ from tkinter import PhotoImage
 
  Program Purpose: Front end of the application. Allows the user to navigate to the option they wish to use.
  
- 
  '''
 
 # Function to run the main function of each script
@@ -31,7 +30,6 @@ root.geometry("300x200")
 logo = PhotoImage(file="logored.png")
 root.iconphoto(False, logo)
 
-# Create buttons
 btn_activitycheck = tk.Button(root, text="Open Activity Check", command=open_activitycheck)
 btn_activitycheck.pack(pady=10)
 
