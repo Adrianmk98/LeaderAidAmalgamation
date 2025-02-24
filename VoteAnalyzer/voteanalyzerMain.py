@@ -4,6 +4,8 @@ import regex as re
 import datetime
 import pytz
 import configparser
+
+from VoteAnalyzer.sortingData import sort_by_party, sort_breakdown_box
 from config.getRedditCreds import fetch_reddit_creds
 from dropDown.helpWindow import VoteAnalyzerHelpWindow
 from VoteAnalyzer.VAplayerLoader import load_player_data
@@ -348,136 +350,14 @@ def display_vote_breakdown(final_votes, all_votes, player_data, vacant_count, su
     # Make the breakdown read-only after updating it
     breakdown_box.config(state=tk.DISABLED)
 
-# Global list to store the original lines with their tags
-original_lines = []
 
-def load_original_lines():
-    global original_lines
-    original_lines.clear()  # Clear previous entries
-    line_start = "1.0"
-    while True:
-        line_end = breakdown_box.index(f"{line_start} lineend")
-        line_text = breakdown_box.get(line_start, line_end)
-
-        if not line_text.strip():
-            break  # Stop if we reach an empty line (end of content)
-
-        # Capture tags for highlighting
-        tags = breakdown_box.tag_names(line_start)
-        vote_type = None
-        if 'green_bg' in tags:
-            vote_type = 'Aye'
-        elif 'red_bg' in tags:
-            vote_type = 'Nay'
-        elif 'yellow_bg' in tags:
-            vote_type = 'Abstain'
-        elif 'no_vote_bg' in tags:
-            vote_type = 'No Vote'
-
-        # Store line with its vote type and text
-        original_lines.append((line_text, vote_type))
-        line_start = breakdown_box.index(f"{line_start}+1line")
-
-def sort_by_party():
-    if not original_lines:
-        load_original_lines()
-
-    lines_with_tags = []
-    for line_text, vote_type in original_lines:
-        try:
-            party_start = line_text.index("[") + 1
-            party_end = line_text.index("]")
-            party_affiliation = line_text[party_start:party_end]
-        except ValueError:
-            party_affiliation = "Unknown"
-
-        lines_with_tags.append((line_text, party_affiliation, vote_type))
-
-    # Sort lines based on party affiliation
-    sorted_lines = sorted(lines_with_tags, key=lambda line: line[1])
-
-    breakdown_box.config(state=tk.NORMAL)
-    breakdown_box.delete(1.0, tk.END)
-
-    previous_party = None
-    for line_text, party, vote_type in sorted_lines:
-        # Insert a line separator if the party changes
-        if party != previous_party:
-            if previous_party is not None:  # Don't insert a line before the first party
-                breakdown_box.insert(tk.END, "-" * 80 + "\n")  # Insert separator line
-            breakdown_box.insert(tk.END, f"{party}:\n")  # Insert party header
-            previous_party = party  # Update the previous party
-
-        # Insert the entry
-        start_idx = breakdown_box.index(tk.END)
-        breakdown_box.insert(tk.END, line_text + "\n")
-        end_idx = breakdown_box.index(tk.END)
-
-        # Highlight the vote type if it's found
-        if vote_type and vote_type in line_text:  # Check if vote_type exists in line_text
-            vote_start = line_text.rindex(vote_type)
-            vote_end = vote_start + len(vote_type)
-            vote_tag_start = f"{start_idx}+{vote_start}c"
-            vote_tag_end = f"{start_idx}+{vote_end}c"
-            breakdown_box.tag_add(vote_type.lower(), vote_tag_start, vote_tag_end)
-
-    breakdown_box.config(state=tk.DISABLED)
-
-def sort_breakdown_box():
-    aye_pattern = re.compile(r'\b(aye|oui|yea|pour|yes|yep|affirmative)\b', re.IGNORECASE)
-    nay_pattern = re.compile(r'\b(nay|non|contre|no|nope|negative)\b', re.IGNORECASE)
-    abstain_pattern = re.compile(r'\b(abstain|abstention|withhold|pass)\b', re.IGNORECASE)
-    breakdown_box.tag_configure('green_bg', background='lightgreen')
-    breakdown_box.tag_configure('red_bg', background='lightcoral')
-    breakdown_box.tag_configure('yellow_bg', background='lightyellow')
-    # Ensure original_lines is available
-    if not original_lines:
-        load_original_lines()  # Load original lines if they are not available
-
-    # Determine vote type using regex patterns
-    lines_with_votes = []
-    for line in original_lines:
-        line_text = line[0]  # Assuming the line structure is (text, vote_type)
-        vote_type = None
-
-        # Check for vote type using regex
-        if aye_pattern.search(line_text):
-            vote_type = 'Aye'
-        elif nay_pattern.search(line_text):
-            vote_type = 'Nay'
-        elif abstain_pattern.search(line_text):
-            vote_type = 'Abstain'
-        else:
-            vote_type = 'No Vote'  # Default if no patterns match
-
-        lines_with_votes.append((line_text, vote_type))
-
-    # Clear the breakdown box and prepare for categorized output
-    breakdown_box.config(state=tk.NORMAL)
-    breakdown_box.delete(1.0, tk.END)
-
-    # Separate lines by vote type
-    for vote_type in ['Aye', 'Nay', 'Abstain', 'No Vote']:
-        # Filter lines by vote type
-        filtered_lines = [line for line in lines_with_votes if line[1] == vote_type]
-
-        if filtered_lines:
-            # Insert a header for the vote type
-            breakdown_box.insert(tk.END, f"{vote_type} Votes:\n")
-            # Insert each line with its corresponding vote type
-            for line_text, _ in filtered_lines:
-                start_index = breakdown_box.index(tk.END)  # Get the current end index
-                breakdown_box.insert(tk.END, line_text + "\n")  # Insert the line without tags
-                # Highlight according to vote type
-                end_index = breakdown_box.index(tk.END)  # Get the end index for the inserted line
-
-            # Insert a separator line after the vote type
-            breakdown_box.insert(tk.END, "-" * 80 + "\n")
-
-    breakdown_box.config(state=tk.DISABLED)
+def addNormalize(PLAYER_DATA_FILE):
+    # Button to trigger analysis
+    analyze_button = tk.Button(root, text="Normalize", command=lambda: analyze_votes_gui(PLAYER_DATA_FILE))
+    analyze_button.grid(row=3, column=1, padx=10, pady=(5, 10))
 
 
-def analyze_votes_gui(PLAYER_DATA_FILE,entry_link):
+def analyze_votes_gui(PLAYER_DATA_FILE):
     reddit_link = entry_link.get()  # Get the Reddit link from the input box
 
     # Load player data from the fixed player file
@@ -536,7 +416,7 @@ def main():
     open_posts_button.grid(row=0, column=1, padx=10, pady=(0, 5))  # Position the button below the entry
 
     # Button to trigger analysis
-    analyze_button = tk.Button(root, text="Analyze Votes", command=lambda:analyze_votes_gui(PLAYER_DATA_FILE,entry_link))
+    analyze_button = tk.Button(root, text="Analyze Votes", command=lambda:analyze_votes_gui(PLAYER_DATA_FILE))
     analyze_button.grid(row=2, column=0, padx=10, pady=(0, 10))  # Position the button below the previous button
 
     # Text area for displaying the breakdown
@@ -547,10 +427,10 @@ def main():
     tally_box = scrolledtext.ScrolledText(root, width=60, height=20)
     tally_box.grid(row=4, column=0, padx=10, pady=(5, 10))  # Add padding for spacing
 
-    sort_button = tk.Button(root, text="Sort by Vote Type", command=sort_breakdown_box)
+    sort_button = tk.Button(root, text="Sort by Vote Type", command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_breakdown_box(breakdown_box)))
     sort_button.grid(row=1, column=1, padx=10, pady=(5, 10))  # Add padding for spacing
 
-    sort_party_button = tk.Button(root, text="Sort by Party Affiliation", command=sort_by_party)
+    sort_party_button = tk.Button(root, text="Sort by Party Affiliation", command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_by_party(breakdown_box)))
     sort_party_button.grid(row=2, column=1, padx=10, pady=(5, 10))
 
     # Define tag styles for highlighting
