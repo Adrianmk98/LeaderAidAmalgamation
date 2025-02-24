@@ -269,6 +269,13 @@ def display_vote_breakdown(final_votes, all_votes, player_data, vacant_count, su
     # Make the breakdown read-only after updating it
     breakdown_box.config(state=tk.DISABLED)
 
+def toggle_editable():
+    if entry_link["state"] == "normal":
+        entry_link.config(state="readonly")
+        toggle_button.config(text="❌")  # X emoji for non-editable
+    else:
+        entry_link.config(state="normal")
+        toggle_button.config(text="✅")  # Checkmark emoji for editable
 
 def addNormalize(PLAYER_DATA_FILE):
     # Button to trigger analysis
@@ -278,7 +285,7 @@ def addNormalize(PLAYER_DATA_FILE):
 
 def analyze_votes_gui(PLAYER_DATA_FILE):
     reddit_link = entry_link.get()  # Get the Reddit link from the input box
-
+    toggle_editable()
     # Load player data from the fixed player file
     player_data, vacant_count = load_player_data()
 
@@ -306,7 +313,7 @@ def analyze_votes_gui(PLAYER_DATA_FILE):
 
 def main():
     global entry_link,breakdown_box
-    global tally_box,window,reddit,root
+    global tally_box,window,reddit,root,toggle_button,entry_link
     # Fixed player data file (adjust the file path accordingly)
     config = configparser.ConfigParser()
     files_read = config.read('config/locationOfTxt.ini')
@@ -330,27 +337,33 @@ def main():
     entry_link = tk.Entry(root, width=50)
     entry_link.grid(row=1, column=0, padx=10, pady=(0, 10))  # Position the entry
 
-    # Button to open recent posts
-    open_posts_button = tk.Button(root, text="Open Recent Posts", command=lambda:open_recent_posts_window(root,reddit,entry_link))
-    open_posts_button.grid(row=0, column=1, padx=10, pady=(0, 5))  # Position the button below the entry
-
     # Button to trigger analysis
     analyze_button = tk.Button(root, text="Analyze Votes", command=lambda:analyze_votes_gui(PLAYER_DATA_FILE))
     analyze_button.grid(row=2, column=0, padx=10, pady=(0, 10))  # Position the button below the previous button
+
 
     # Text area for displaying the breakdown
     breakdown_box = scrolledtext.ScrolledText(root, width=80, height=30)
     breakdown_box.grid(row=3, column=0, padx=10, pady=(5, 10))  # Add padding for spacing
 
+    # Toggle button to lock/unlock the entry, positioned right next to the link entry
+    toggle_button = tk.Button(root, text="✅", command=toggle_editable, relief="flat")
+    toggle_button.grid(row=0, column=1, padx=2, pady=5, sticky="w")
+
     # Text area for displaying the tally
     tally_box = scrolledtext.ScrolledText(root, width=60, height=20)
     tally_box.grid(row=4, column=0, padx=10, pady=(5, 10))  # Add padding for spacing
 
+    # Button to open recent posts
+    open_posts_button = tk.Button(root, text="Open Recent Posts",
+                                  command=lambda: open_recent_posts_window(root, reddit, entry_link))
+    open_posts_button.grid(row=0, column=2, padx=10, pady=(0, 5))  # Position the button below the entry
+
     sort_button = tk.Button(root, text="Sort by Vote Type", command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_breakdown_box(breakdown_box)))
-    sort_button.grid(row=1, column=1, padx=10, pady=(5, 10))  # Add padding for spacing
+    sort_button.grid(row=1, column=2, padx=10, pady=(5, 10))  # Add padding for spacing
 
     sort_party_button = tk.Button(root, text="Sort by Party Affiliation", command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_by_party(breakdown_box)))
-    sort_party_button.grid(row=2, column=1, padx=10, pady=(5, 10))
+    sort_party_button.grid(row=2, column=2, padx=10, pady=(5, 10))
 
     # Define tag styles for highlighting
     breakdown_box.tag_config('green_bg', background='lightgreen')
