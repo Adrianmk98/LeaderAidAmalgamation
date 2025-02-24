@@ -72,7 +72,6 @@ def sort_by_party(breakdown_box):
         breakdown_box.tag_configure('red_bg', background='lightcoral')
         breakdown_box.tag_configure('yellow_bg', background='lightyellow')
 
-        print(vote_type,"BADWOLF")
         if vote_type == 'Aye':
             breakdown_box.insert(tk.END, line_text+ "\n", 'green_bg')
         elif vote_type == 'Nay':
@@ -125,7 +124,16 @@ def sort_by_govPosition(breakdown_box):
 
         # Insert the entry
         start_idx = breakdown_box.index(tk.END)
-        breakdown_box.insert(tk.END, line_text + "\n")
+        breakdown_box.tag_configure('green_bg', background='lightgreen')
+        breakdown_box.tag_configure('red_bg', background='lightcoral')
+        breakdown_box.tag_configure('yellow_bg', background='lightyellow')
+
+        if vote_type == 'Aye':
+            breakdown_box.insert(tk.END, line_text + "\n", 'green_bg')
+        elif vote_type == 'Nay':
+            breakdown_box.insert(tk.END, line_text + "\n", 'red_bg')
+        elif vote_type == 'Abstain':
+            breakdown_box.insert(tk.END, line_text + "\n", 'yellow_bg')
         end_idx = breakdown_box.index(tk.END)
 
         # Highlight the vote type if it's found
