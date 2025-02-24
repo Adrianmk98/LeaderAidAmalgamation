@@ -1,9 +1,14 @@
 #Loads playerdata for the VoteAnalyzer from the path where the file is located
-def load_player_data(playerFile):
+import configparser
+
+
+def load_player_data():
     player_data = {}
     vacant_count = 0  # Initialize vacant count
-
-    with open(playerFile, 'r') as file:
+    config = configparser.ConfigParser()
+    files_read = config.read('config/locationOfTxt.ini')
+    PLAYER_DATA_FILE = config['player']['playerFile']
+    with open(PLAYER_DATA_FILE, 'r') as file:
         for line in file:
             if line.strip() == "" or line.startswith(("Electoral District", "Party List")):
                 continue
