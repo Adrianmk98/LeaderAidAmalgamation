@@ -27,6 +27,7 @@ def load_original_lines(breakdown_box):
 
         # Store line with its vote type and text
         original_lines.append((line_text, vote_type))
+        print(line_text)
         line_start = breakdown_box.index(f"{line_start}+1line")
 
 def sort_by_party(breakdown_box):
@@ -36,13 +37,76 @@ def sort_by_party(breakdown_box):
     lines_with_tags = []
     for line_text, vote_type in original_lines:
         try:
-            party_start = line_text.index("[") + 1
-            party_end = line_text.index("]")
-            party_affiliation = line_text[party_start:party_end]
+            # Find first occurrence of '(' and start searching after it
+            first_open = line_text.index("[")
+            second_open = line_text.index("[", first_open + 1)
+
+            # Find the corresponding closing ']'
+            second_close = line_text.index("]", second_open)
+
+            # Extract text inside the second pair of parentheses
+            party_affiliation = line_text[second_open + 1: second_close]
         except ValueError:
-            party_affiliation = "Unknown"
+            party_affiliation = "Unk"
 
         lines_with_tags.append((line_text, party_affiliation, vote_type))
+
+    # Sort lines based on party affiliation
+    sorted_lines = sorted(lines_with_tags, key=lambda line: line[1])
+
+    breakdown_box.config(state=tk.NORMAL)
+    breakdown_box.delete(1.0, tk.END)
+
+    previous_party = None
+    for line_text, party, vote_type in sorted_lines:
+        # Insert a line separator if the party changes
+        if party != previous_party:
+            if previous_party is not None:  # Don't insert a line before the first party
+                breakdown_box.insert(tk.END, "-" * 80 + "\n")  # Insert separator line
+            breakdown_box.insert(tk.END, f"{party}:\n")  # Insert party header
+            previous_party = party  # Update the previous party
+
+        # Insert the entry
+        start_idx = breakdown_box.index(tk.END)
+        breakdown_box.tag_configure('green_bg', background='lightgreen')
+        breakdown_box.tag_configure('red_bg', background='lightcoral')
+        breakdown_box.tag_configure('yellow_bg', background='lightyellow')
+
+        print(vote_type,"BADWOLF")
+        if vote_type == 'Aye':
+            breakdown_box.insert(tk.END, line_text+ "\n", 'green_bg')
+        elif vote_type == 'Nay':
+            breakdown_box.insert(tk.END, line_text+ "\n", 'red_bg')
+        elif vote_type == 'Abstain':
+            breakdown_box.insert(tk.END, line_text+ "\n", 'yellow_bg')
+
+        #breakdown_box.insert(tk.END, line_text + "\n")
+        end_idx = breakdown_box.index(tk.END)
+
+        # Highlight the vote type if it's found
+        if vote_type and vote_type in line_text:  # Check if vote_type exists in line_text
+            vote_start = line_text.rindex(vote_type)
+            vote_end = vote_start + len(vote_type)
+            vote_tag_start = f"{start_idx}+{vote_start}c"
+            vote_tag_end = f"{start_idx}+{vote_end}c"
+            breakdown_box.tag_add(vote_type.lower(), vote_tag_start, vote_tag_end)
+
+    breakdown_box.config(state=tk.DISABLED)
+
+def sort_by_govPosition(breakdown_box):
+    if not original_lines:
+        load_original_lines(breakdown_box)
+
+    lines_with_tags = []
+    for line_text, vote_type in original_lines:
+        try:
+            party_start = line_text.index("[") + 1
+            party_end = line_text.index("]")
+            position_affiliation = line_text[party_start:party_end]
+        except ValueError:
+            position_affiliation = "Unk"
+
+        lines_with_tags.append((line_text, position_affiliation, vote_type))
 
     # Sort lines based on party affiliation
     sorted_lines = sorted(lines_with_tags, key=lambda line: line[1])
@@ -73,6 +137,7 @@ def sort_by_party(breakdown_box):
             breakdown_box.tag_add(vote_type.lower(), vote_tag_start, vote_tag_end)
 
     breakdown_box.config(state=tk.DISABLED)
+
 
 def sort_breakdown_box(breakdown_box):
     aye_pattern = re.compile(r'\b(aye|oui|yea|pour|yes|yep|affirmative)\b', re.IGNORECASE)
