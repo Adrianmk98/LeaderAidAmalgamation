@@ -1,4 +1,5 @@
 import tkinter as tk
+import webbrowser
 from tkinter import scrolledtext, messagebox, ttk
 import regex as re
 import datetime
@@ -6,7 +7,7 @@ import pytz
 import configparser
 
 from VoteAnalyzer.recentPostLoader import open_recent_posts_window
-from VoteAnalyzer.sortingData import sort_by_party, sort_breakdown_box
+from VoteAnalyzer.sortingData import sort_by_party, sort_by_type, sort_by_govPosition
 from config.getRedditCreds import fetch_reddit_creds
 from dropDown.helpWindow import VoteAnalyzerHelpWindow
 from VoteAnalyzer.VAplayerLoader import load_player_data
@@ -90,18 +91,19 @@ def analyze_votes(submission, player_data):
                 mp_data = relevant_mp[author]
                 riding = mp_data.get("riding", "Unknown")
                 party = mp_data.get("party", "Indy")
+                govPos =mp_data.get("position", "Unk")
 
                 comment_text_lower = comment_text.lower()
 
                 # Count votes based on comment text
                 if aye_pattern.search(comment_text_lower):
-                    votes[author] = ('aye', riding, party, comment.created_utc)
+                    votes[author] = ('aye', riding, party, comment.created_utc,govPos)
                     party_breakdown[party] = party_breakdown.get(party, 0) + 1
                 elif nay_pattern.search(comment_text_lower):
-                    votes[author] = ('nay', riding, party, comment.created_utc)
+                    votes[author] = ('nay', riding, party, comment.created_utc,govPos)
                     party_breakdown[party] = party_breakdown.get(party, 0) + 1
                 elif abstain_pattern.search(comment_text_lower):
-                    votes[author] = ('abstain', riding, party, comment.created_utc)
+                    votes[author] = ('abstain', riding, party, comment.created_utc,govPos)
 
     # Calculate all_mps and voted_mps
     all_mps = set(relevant_mp.keys())  # Only consider MPs who were in office
@@ -112,9 +114,9 @@ def analyze_votes(submission, player_data):
 
     # Final vote tally
     final_votes = {}
-    for author, (vote_type, riding, party, timestamp) in votes.items():
+    for author, (vote_type, riding, party, timestamp,govPos) in votes.items():
         if author not in final_votes or final_votes[author][3] < timestamp:
-            final_votes[author] = (vote_type, riding, party, timestamp)
+            final_votes[author] = (vote_type, riding, party, timestamp,govPos)
 
     return final_votes, all_votes, non_voters
 
@@ -140,8 +142,9 @@ def display_vote_breakdown(final_votes, all_votes, player_data, vacant_count, su
     for author, (comment_text, player_info) in all_votes.items():
         riding = player_info.get("riding", "Unknown")
         party = player_info.get("party", "Indy")
+        govPos = player_info.get("position", "Unk")
         vote_type = final_votes.get(author, [None])[0]
-        line_text = f"({riding})\t{author.capitalize()} [{party}]: {comment_text}\n"
+        line_text = f"[{govPos}] ({riding})\t{author.capitalize()} [{party}]: {comment_text}\n"
 
         if author in player_data:
             # Highlight vote types
@@ -280,7 +283,7 @@ def toggle_editable():
 def addNormalize(PLAYER_DATA_FILE):
     # Button to trigger analysis
     analyze_button = tk.Button(root, text="Normalize", command=lambda: analyze_votes_gui(PLAYER_DATA_FILE))
-    analyze_button.grid(row=3, column=1, padx=10, pady=(5, 10))
+    analyze_button.grid(row=4, column=2, padx=10, pady=(5, 10))
 
 
 def analyze_votes_gui(PLAYER_DATA_FILE):
@@ -310,6 +313,10 @@ def analyze_votes_gui(PLAYER_DATA_FILE):
 
     # Display the results and tally, passing old_players as well
     display_vote_breakdown(final_votes, all_votes, player_data, vacant_count, submission)
+
+def open_in_browser(entry_link):
+    reddit_link = entry_link.get()
+    webbrowser.open(reddit_link)
 
 def main():
     global entry_link,breakdown_box
@@ -341,10 +348,14 @@ def main():
     analyze_button = tk.Button(root, text="Analyze Votes", command=lambda:analyze_votes_gui(PLAYER_DATA_FILE))
     analyze_button.grid(row=2, column=0, padx=10, pady=(0, 10))  # Position the button below the previous button
 
+    # Button to trigger analysis
+    OpenVoteinBrowser = tk.Button(root, text="Open in Browser", command=lambda:open_in_browser(entry_link))
+    OpenVoteinBrowser.grid(row=3, column=0, padx=10, pady=(0, 10))  # Position the button below the previous button
+
 
     # Text area for displaying the breakdown
     breakdown_box = scrolledtext.ScrolledText(root, width=80, height=30)
-    breakdown_box.grid(row=3, column=0, padx=10, pady=(5, 10))  # Add padding for spacing
+    breakdown_box.grid(row=5, column=0, padx=10, pady=(5, 10))  # Add padding for spacing
 
     # Toggle button to lock/unlock the entry, positioned right next to the link entry
     toggle_button = tk.Button(root, text="✅", command=toggle_editable, relief="flat")
@@ -352,18 +363,22 @@ def main():
 
     # Text area for displaying the tally
     tally_box = scrolledtext.ScrolledText(root, width=60, height=20)
-    tally_box.grid(row=4, column=0, padx=10, pady=(5, 10))  # Add padding for spacing
+    tally_box.grid(row=6, column=0, padx=10, pady=(5, 10))  # Add padding for spacing
 
     # Button to open recent posts
     open_posts_button = tk.Button(root, text="Open Recent Posts",
                                   command=lambda: open_recent_posts_window(root, reddit, entry_link))
     open_posts_button.grid(row=0, column=2, padx=10, pady=(0, 5))  # Position the button below the entry
 
-    sort_button = tk.Button(root, text="Sort by Vote Type", command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_breakdown_box(breakdown_box)))
+    sort_button = tk.Button(root, text="Sort by Vote Type", command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_by_type(breakdown_box)))
     sort_button.grid(row=1, column=2, padx=10, pady=(5, 10))  # Add padding for spacing
 
     sort_party_button = tk.Button(root, text="Sort by Party Affiliation", command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_by_party(breakdown_box)))
     sort_party_button.grid(row=2, column=2, padx=10, pady=(5, 10))
+
+    sort_govPosition_button = tk.Button(root, text="Sort by Gov Position",
+                                  command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_by_govPosition(breakdown_box)))
+    sort_govPosition_button.grid(row=3, column=2, padx=10, pady=(5, 10))
 
     # Define tag styles for highlighting
     breakdown_box.tag_config('green_bg', background='lightgreen')
