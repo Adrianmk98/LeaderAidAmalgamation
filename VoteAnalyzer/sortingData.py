@@ -59,18 +59,20 @@ def sort_by_party(breakdown_box):
 
     previous_party = None
     for line_text, party, vote_type in sorted_lines:
-        # Insert a line separator if the party changes
-        if party != previous_party:
-            if previous_party is not None:  # Don't insert a line before the first party
-                breakdown_box.insert(tk.END, "-" * 80 + "\n")  # Insert separator line
-            breakdown_box.insert(tk.END, f"{party}:\n")  # Insert party header
-            previous_party = party  # Update the previous party
-
-        # Insert the entry
-        start_idx = breakdown_box.index(tk.END)
+        breakdown_box.tag_config('graybox', background='lightgray')
         breakdown_box.tag_configure('green_bg', background='lightgreen')
         breakdown_box.tag_configure('red_bg', background='lightcoral')
         breakdown_box.tag_configure('yellow_bg', background='lightyellow')
+
+        if party != previous_party:
+            if previous_party is not None:  # Don't insert a line before the first party
+                breakdown_box.insert(tk.END, "-" * 80 + "\n",'graybox')  # Insert separator line
+            breakdown_box.insert(tk.END, f"{party}:\n",'graybox')  # Insert party header
+            previous_party = party  # Update the previous party
+
+
+
+        start_idx = breakdown_box.index(tk.END)
 
         if vote_type == 'Aye':
             breakdown_box.insert(tk.END, line_text+ "\n", 'green_bg')
@@ -79,7 +81,6 @@ def sort_by_party(breakdown_box):
         elif vote_type == 'Abstain':
             breakdown_box.insert(tk.END, line_text+ "\n", 'yellow_bg')
 
-        #breakdown_box.insert(tk.END, line_text + "\n")
         end_idx = breakdown_box.index(tk.END)
 
         # Highlight the vote type if it's found
@@ -116,17 +117,18 @@ def sort_by_govPosition(breakdown_box):
     previous_party = None
     for line_text, party, vote_type in sorted_lines:
         # Insert a line separator if the party changes
+        breakdown_box.tag_config('graybox', background='lightgray')
+        breakdown_box.tag_configure('green_bg', background='lightgreen')
+        breakdown_box.tag_configure('red_bg', background='lightcoral')
+        breakdown_box.tag_configure('yellow_bg', background='lightyellow')
         if party != previous_party:
             if previous_party is not None:  # Don't insert a line before the first party
-                breakdown_box.insert(tk.END, "-" * 80 + "\n")  # Insert separator line
-            breakdown_box.insert(tk.END, f"{party}:\n")  # Insert party header
+                breakdown_box.insert(tk.END, "-" * 80 + "\n",'graybox')  # Insert separator line
+            breakdown_box.insert(tk.END, f"{party}:\n",'graybox')  # Insert party header
             previous_party = party  # Update the previous party
 
         # Insert the entry
         start_idx = breakdown_box.index(tk.END)
-        breakdown_box.tag_configure('green_bg', background='lightgreen')
-        breakdown_box.tag_configure('red_bg', background='lightcoral')
-        breakdown_box.tag_configure('yellow_bg', background='lightyellow')
 
         if vote_type == 'Aye':
             breakdown_box.insert(tk.END, line_text + "\n", 'green_bg')
@@ -147,13 +149,14 @@ def sort_by_govPosition(breakdown_box):
     breakdown_box.config(state=tk.DISABLED)
 
 
-def sort_breakdown_box(breakdown_box):
+def sort_by_type(breakdown_box):
     aye_pattern = re.compile(r'\b(aye|oui|yea|pour|yes|yep|affirmative)\b', re.IGNORECASE)
     nay_pattern = re.compile(r'\b(nay|non|contre|no|nope|negative)\b', re.IGNORECASE)
     abstain_pattern = re.compile(r'\b(abstain|abstention|withhold|pass)\b', re.IGNORECASE)
     breakdown_box.tag_configure('green_bg', background='lightgreen')
     breakdown_box.tag_configure('red_bg', background='lightcoral')
     breakdown_box.tag_configure('yellow_bg', background='lightyellow')
+    breakdown_box.tag_config('graybox', background='lightgray')
     # Ensure original_lines is available
     if not original_lines:
         load_original_lines(breakdown_box)  # Load original lines if they are not available
@@ -187,15 +190,20 @@ def sort_breakdown_box(breakdown_box):
 
         if filtered_lines:
             # Insert a header for the vote type
-            breakdown_box.insert(tk.END, f"{vote_type} Votes:\n")
+            breakdown_box.insert(tk.END, f"{vote_type} Votes:\n",'graybox')
             # Insert each line with its corresponding vote type
             for line_text, _ in filtered_lines:
                 start_index = breakdown_box.index(tk.END)  # Get the current end index
-                breakdown_box.insert(tk.END, line_text + "\n")  # Insert the line without tags
+                if vote_type == 'Aye':
+                    breakdown_box.insert(tk.END, line_text + "\n", 'green_bg')
+                elif vote_type == 'Nay':
+                    breakdown_box.insert(tk.END, line_text + "\n", 'red_bg')
+                elif vote_type == 'Abstain':
+                    breakdown_box.insert(tk.END, line_text + "\n", 'yellow_bg')
                 # Highlight according to vote type
                 end_index = breakdown_box.index(tk.END)  # Get the end index for the inserted line
 
             # Insert a separator line after the vote type
-            breakdown_box.insert(tk.END, "-" * 80 + "\n")
+            breakdown_box.insert(tk.END, "-" * 80 + "\n",'graybox')
 
     breakdown_box.config(state=tk.DISABLED)
