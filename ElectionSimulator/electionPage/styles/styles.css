@@ -1,0 +1,420 @@
+body {
+	 overflow: hidden;
+	 font-family: 'Trebuchet MS', sans-serif;
+}
+ .base {
+	 position: absolute;
+	 left: 0;
+	 top: 0;
+	 width: 100vw;
+	 height: 100vh;
+}
+ .progress {
+	 transition: width 0.5s ease;
+}
+ #setup {
+	 z-index: 5;
+	 background-color: white;
+	 display: flex;
+	 flex-direction: column;
+	 flex-flow: center;
+}
+ #setup > * {
+	 width: fit-content;
+	 margin-top: 10px;
+	 align-self: center;
+}
+ @keyframes errorAnimation {
+	 0% {
+		 opacity: 1;
+	}
+	 1% {
+		 transform: translate(20px, 0px);
+	}
+	 2% {
+		 transform: translate(-20px, 0px);
+	}
+	 3% {
+		 transform: translate(20px, 0px);
+	}
+	 4% {
+		 transform: translate(-10px, 0px);
+	}
+	 5% {
+		 transform: translate(0px, 0px);
+	}
+	 96.6666666667% {
+		 opacity: 1;
+	}
+	 100% {
+		 opacity: 0;
+	}
+}
+ #setup div {
+	 display: flex;
+	 flex-flow: center;
+}
+ #setup #message {
+	 opacity: 0;
+}
+ #setup .alert {
+	 animation: errorAnimation 10s 1;
+}
+ #background {
+	 transition: transform;
+	 transition-timing-function: ease;
+	 transition-duration: 5s;
+	 transform: scale(1) translate(0%, 0%);
+}
+ #background div {
+	 background-color: rgba(172, 186, 198, 0.7);
+	 width: 100%;
+	 height: 100%;
+}
+ #background img {
+	 min-width: 100%;
+	 min-height: 100%;
+}
+ #background .transition {
+	 transition: opacity;
+	 transition-timing-function: ease;
+}
+ #ridingResults {
+	 display: grid;
+	 grid-template-columns: 5.8823529412% 58.8235294118% 5.8823529412% 29.4117647059%;
+	 grid-template-rows: 10vh 1fr 50vh 1fr 15vh;
+	 grid-template-areas: "header header header rightBar" ". . . rightBar" ". main . rightBar" ". . . rightBar" "footer footer footer rightBar";
+	 z-index: 4;
+}
+ #ridingResults .content {
+	 width: 100%;
+	 height: 100%;
+}
+ #ridingResults #header {
+	 grid-area: header;
+	 background: #9fafb9;
+	 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	 display: flex;
+	 justify-content: space-between;
+}
+ #ridingResults #header * {
+	 align-self: flex-end;
+	 font-size: 3vh;
+	 color: #2b3236;
+	 padding-left: 5vw;
+	 padding-right: 5vw;
+	 margin-bottom: 2vh;
+}
+ #ridingResults #header :last-child {
+	 border-left: solid 3px black;
+	 padding-left: 0.5vw;
+}
+ #ridingResults #main {
+	 grid-area: main;
+	 display: flex;
+	 flex-direction: row;
+	 justify-content: space-evenly;
+}
+ #ridingResults #main .candidate {
+	 height: 100%;
+	 width: 200px;
+	 display: grid;
+	 border-left: solid 5px blue;
+	 grid-template-columns: 10px 1fr 1fr;
+	 grid-template-rows: auto 40% 20px 20% 25% auto;
+	 grid-template-areas: ". . ." ". face ." ". face party" ". name name" ". vote vote" ". . .";
+}
+ #ridingResults #main .candidate img {
+	 grid-area: face;
+	 width: 100%;
+	 height: 100%;
+}
+ #ridingResults #main .candidate .party {
+	 grid-area: party;
+	 justify-self: end;
+	 width: 90%;
+	 height: 100%;
+	 padding-left: 5px;
+	 background-color: red;
+	 color: white;
+	 border-top-left-radius: 10px;
+	 border-bottom-left-radius: 10px;
+}
+ #ridingResults #main .candidate .name {
+	 grid-area: name;
+	 color: #3e4d4d;
+	 width: 90%;
+	 height: 90%;
+	 padding-top: 5%;
+	 font-size: 5vh;
+}
+ #ridingResults #main .candidate :not(.cover,.bottom) {
+	 z-index: 4;
+}
+ #ridingResults #main .candidate .cover {
+	 grid-row-start: 1;
+	 grid-column-start: 1;
+	 grid-row-end: 5;
+	 grid-column-end: last;
+	 width: 100%;
+	 height: 100%;
+	 background: linear-gradient(45deg, rgba(255, 255, 255, 0.75) 0%, rgba(100, 100, 100, 0.5) 100%);
+}
+ #ridingResults #main .candidate .bottom {
+	 grid-row-start: 5;
+	 grid-column-start: 1;
+	 grid-row-end: last;
+	 grid-column-end: last;
+	 background-color: rgba(104, 110, 122, 0.75);
+}
+ #ridingResults #main .candidate .vote {
+	 grid-area: vote;
+	 display: flex;
+	 width: 100%;
+	 height: 90%;
+	 margin-top: 5%;
+}
+ #ridingResults #main .candidate .vote * {
+	 height: 100%;
+	 width: 50%;
+}
+ #ridingResults #main .candidate .vote .percent {
+	 display: flex;
+	 flex-direction: column;
+	 color: white;
+	 border-right: solid 2px #3e4d4d;
+}
+ #ridingResults #main .candidate .vote .percent h1 {
+	 margin-left: 10%;
+	 text-align: center;
+}
+ #ridingResults #main .candidate .vote .percent #progressBar {
+	 width: 90%;
+	 height: 10px;
+	 background-color: #3e4d4d;
+}
+ #ridingResults #main .candidate .vote .percent #progressBar .progress {
+	 width: 70%;
+	 background: black;
+}
+ #ridingResults #main .candidate .vote .voteCount.winner {
+	 margin-left: 5%;
+}
+ #ridingResults #main .candidate .vote .voteCount {
+	 display: flex;
+	 flex-direction: column;
+	 justify-content: space-evenly;
+	 margin-left: 15%;
+}
+ #ridingResults #main .candidate .vote .voteCount * {
+	 width: fit-content;
+	 height: fit-content;
+	 color: white;
+	 margin-top: 0%;
+	 margin-bottom: 0%;
+}
+ #ridingResults #rightBar {
+	 grid-area: rightBar;
+	 background: linear-gradient(0deg, #343b42 76.15vh, rgba(38, 49, 64, 1) 76.15vh);
+	 padding-left: 5px;
+	 width: calc(100% - 5px);
+	 display: flex;
+	 flex-direction: column;
+}
+ #ridingResults #rightBar #logo {
+	 height: 10vh;
+	 display: flex;
+	 justify-content: center;
+	 margin-top: 3vh;
+	 margin-bottom: 5vh;
+}
+ #ridingResults #rightBar #logo * {
+	 align-self: center;
+}
+ #ridingResults #rightBar #logo img {
+	 height: 100%;
+	 width: auto;
+}
+ #ridingResults #rightBar #logo div {
+	 display: block;
+	 position: relative;
+	 margin-left: 0.1vw;
+	 align-self: flex-end;
+}
+ #ridingResults #rightBar #logo div div {
+	 color: white;
+}
+ #ridingResults #rightBar #logo div div:first-child {
+	 font-size: 7vh;
+	 padding-top: 1vh;
+	 padding-bottom: 1vh;
+	 padding-left: 1vw;
+	 padding-right: 1vw;
+	 border-top: solid white 2px;
+	 border-bottom: solid white 2px;
+}
+ #ridingResults #rightBar #logo div div:last-child {
+	 position: absolute;
+	 width: fit-content;
+	 padding-left: 2vw;
+	 padding-right: 2vw;
+	 font-size: 2vh;
+	 bottom: -1vh;
+	 left: 50%;
+	 transform: translate(-50%, 0);
+	 background-color: rgba(38, 49, 64, 1);
+}
+ #ridingResults #rightBar #secondaryPoll {
+	 width: 100%;
+}
+ #ridingResults #rightBar #secondaryPoll #reportingPolls {
+	 color: white;
+	 font-size: 4vh;
+	 margin-left: 10px;
+}
+ #ridingResults #rightBar #secondaryPoll #ridingName {
+	 width: 100%;
+	 height: 5vh;
+	 background-color: #bfc8d3;
+	 font-size: 3vh;
+	 padding-left: 10px;
+	 padding-top: 3px;
+	 padding-bottom: 7px;
+	 margin-top: 10px;
+}
+ #ridingResults #rightBar #secondaryPoll .candidates {
+	 height: 50vh;
+}
+ #ridingResults #rightBar #secondaryPoll .candidates .candidate {
+	 height: 12.5vh;
+	 width: 85%;
+	 display: grid;
+	 grid-template-columns: 12.5vh auto;
+	 grid-template-rows: 1fr 1fr 1fr;
+	 grid-template-areas: "face party" "face name" "face vote";
+	 border-radius: 10px;
+	 margin-top: 10px;
+	 background-color: #bfc8d3;
+	 overflow: hidden;
+}
+ #ridingResults #rightBar #secondaryPoll .candidates .candidate img {
+	 grid-area: face;
+	 height: 100%;
+	 width: auto;
+}
+ #ridingResults #rightBar #secondaryPoll .candidates .candidate > div {
+	 width: 100%;
+	 height: 100%;
+	 display: flex;
+	 justify-content: space-between;
+}
+ #ridingResults #rightBar #secondaryPoll .candidates .candidate > div > div {
+	 align-self: center;
+	 margin-left: 5px;
+	 margin-right: 15px;
+	 font-size: 2.3vh;
+}
+ #ridingResults #rightBar #secondaryPoll .candidates .candidate #party {
+	 grid-area: party;
+	 color: #bfc8d3;
+	 border-top-left-radius: 5px;
+	 border-bottom-left-radius: 5px;
+}
+ #ridingResults #rightBar #secondaryPoll .candidates .candidate #name {
+	 background-color: #bfc8d3;
+	 color: #56636e;
+}
+ #ridingResults #rightBar #secondaryPoll .candidates .candidate #vote {
+	 background-color: #56636e;
+	 color: #bfc8d3;
+}
+ #ridingResults #rightBar #secondaryPoll .candidates .candidate:first-child {
+	 height: 20vh;
+	 width: 100%;
+	 grid-template-columns: 20vh auto;
+	 border-top-right-radius: 0px;
+	 border-bottom-right-radius: 0px;
+}
+ #ridingResults #rightBar #majorityMeter {
+	 height: 12.5vh;
+	 width: 85%;
+	 margin-top: 10%;
+	 border-radius: 10px;
+	 position: relative;
+	 background-color: #e5f0fd;
+}
+ #ridingResults #rightBar #majorityMeter #overlay {
+	 position: absolute;
+	 top: 0;
+	 left: 0;
+	 height: 100%;
+	 width: 100%;
+	 display: grid;
+	 grid-template-columns: 65% 35%;
+	 grid-template-rows: 30% 70%;
+	 color: #56636e;
+}
+ #ridingResults #rightBar #majorityMeter #overlay div {
+	 margin-left: 10px;
+	 margin-right: 10px;
+	 margin-top: 5%;
+	 font-size: 2.5vh;
+}
+ #ridingResults #rightBar #majorityMeter #overlay #bar {
+	 width: 2px;
+	 margin: 0px;
+	 height: 90%;
+	 grid-column-start: 2;
+	 background-color: #56636e;
+}
+ #ridingResults #rightBar #majorityMeter #polling {
+	 height: 70%;
+	 width: 90%;
+	 margin-top: 10%;
+	 display: flex;
+	 flex-direction: column;
+	 justify-content: space-evenly;
+}
+ #ridingResults #rightBar #majorityMeter #polling .progress {
+	 margin-left: 15px;
+	 height: 5px;
+	 width: 0%;
+	 background-color: green;
+}
+ #ridingResults #footer {
+	 grid-area: footer;
+	 background: #1d2935;
+	 display: flex;
+	 justify-content: center;
+}
+ #ridingResults #footer > * {
+	 align-self: center;
+	 height: 10vh;
+}
+ #ridingResults #footer .party {
+	 background-color: purple;
+	 display: flex;
+	 flex-direction: column;
+	 justify-content: space-around;
+	 width: 10vh;
+	 margin-left: 5vh;
+	 margin-right: 5vh;
+	 border-radius: 1vh;
+}
+ #ridingResults #footer .party > * {
+	 width: fit-content;
+	 align-self: center;
+	 text-align: center;
+	 color: white;
+}
+ #ridingResults #footer .party .seat {
+	 width: fit-content;
+	 height: fit-content;
+	 background-color: rgba(0, 0, 0, 0.5);
+	 padding: 10% 35%;
+}
+ #ridingResults #footer .separator {
+	 width: 2px;
+	 background-color: #434b4e;
+}
+ 

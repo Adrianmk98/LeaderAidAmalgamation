@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Election Live Stream</title>
+	<link rel="stylesheet" type="text/css" href=styles/styles.css>
+</head>
+<body>
+	<div id="setup" class="base">
+
+		<h1>Election Live Stream</h1>
+		<h2>Set Up</h2>
+		
+		<div>
+			Party Data: <input id="partySettings" type="file">
+		</div>
+		
+
+		<div>
+			Riding Data: <input id="ridingSettings" type="file">
+		</div>
+
+		<div>
+			Primary:
+			<input type="number" min="0" value="10" id="primary">
+			<select id="primary">
+				<option value="sec">sec</option>
+				<option value="min">min</option>
+			</select>
+		</div>
+
+		<div>
+			Secondary:
+			<input type="number" min="0" value="10" id="secondary">
+			<select id="secondary">
+				<option value="sec">sec</option>
+				<option value="min">min</option>
+			</select>
+		</div>
+
+		<button id="run">RUN</button>
+
+		<div id="message">
+		</div>
+	</div>
+	<!-- Add this after your setup div -->
+<div id="controlButton" style="display:none; position:fixed; top:10px; right:10px; z-index:9999;">
+    <button onclick="openControlPanel()" style="
+        background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    ">
+        🎛️ Control Panel
+    </button>
+</div>
+
+<script>
+function openControlPanel() {
+    window.open('control.html', 'ElectionControl', 
+        'width=450,height=900,resizable=yes,scrollbars=yes,location=no,menubar=no');
+}
+
+// Show control button when setup is complete
+function showControlButton() {
+    document.getElementById('controlButton').style.display = 'block';
+}
+</script>
+	<div id="ridingResults" class="base">
+		<div id="header" class="content">
+			<div>
+				Name
+			</div>
+
+			<div id="reportingPolls">
+				Polls Reporting 2/148
+			</div>
+		</div>
+		<div id="main" class="content">
+			
+		</div>
+		<div id="rightBar" class="content">
+			<div id="logo">
+				<img src="imgs/CMHoC_Logo.png">
+				<div>
+					<div>
+						Election
+					</div>
+					<div>
+						CMHOC
+					</div>
+				</div>
+			</div>
+
+			<div id="secondaryPoll">
+				<div id="reportingPolls">
+					Polls Reporting 0/278
+				</div>
+				<div id="ridingName">
+					Riding Name
+				</div>
+				<div class="candidates">
+					
+				</div>
+			</div>
+
+			<div id="majorityMeter">
+				<div id="overlay">
+					<div>
+						Majority Meter
+					</div>
+					<div>
+						170 seats
+					</div>
+					<div id="bar">
+					</div>
+				</div>
+				<div id="polling">
+				</div>
+			</div>
+		</div>
+		<div id="footer" class="content">
+		</div>
+		
+	</div>
+	<div id="background" class="base">
+		<div class="base" style="z-index: 3"></div>
+		<img src="backgrounds\1.jpg" id="nextBackgroundImage" class="base">
+		<img src="backgrounds\2.jpg" id="currentBackgroundImage" class="base">
+	</div>
+
+	<!-- Dependencies -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="scripts/ElectionBehavior/shared/Listener.js"></script>
+	<script src="scripts/ElectionBehavior/shared/Riding.js"></script>
+	<script src="scripts/ElectionBehavior/shared/Candidate.js"></script>
+	<script src="scripts/ElectionBehavior/shared/Party.js"></script>
+	<script src="scripts/ElectionBehavior/shared/Exception.js"></script>
+	<script src="scripts/ElectionBehavior/shared/RidingPools.js"></script>
+	<script src="scripts/ElectionBehavior/shared/winnerCalculator/WinnerCalculator.js"></script>
+	<script src="scripts/ElectionBehavior/shared/winnerCalculator/FirstPastThePost.js"></script>
+
+	<!-- UI scripts -->
+	<script src="scripts/UI/facade/Facade.js"></script>	
+	<script src="scripts/UI/backgroundHandler.js"></script>
+	<script src="scripts/UI/facade/PrimaryPolling.js"></script>
+	<script src="scripts/UI/facade/SecondaryPolling.js"></script>
+	<script src="scripts/UI/facade/SeatCount.js"></script>
+	<script src="scripts/UI/facade/MajorityMeter.js"></script>
+	
+	<!-- SetUp -->
+	<script src="scripts/ElectionBehavior/CSVParser.js"></script>
+	<script src="scripts/ElectionBehavior/SetUp.js"></script>
+	
+	<!-- Main -->
+	<script src="scripts/ElectionBehavior/Main.js"></script>
+	
+
+	<!-- Election  -->
+
+
+</body>
+
+</html>

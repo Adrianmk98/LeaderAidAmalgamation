@@ -1,0 +1,712 @@
+body
+{
+	overflow: hidden;
+	font-family: 'Trebuchet MS', sans-serif;
+}
+
+.base
+{
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	width: 100vw;
+	height: 100vh;
+
+}
+
+.progress
+{
+	transition: width 0.5s ease;
+}
+
+#setup
+{
+	z-index: 5;
+	background-color: white;
+
+	display: flex;
+	flex-direction: column;
+	flex-flow: center;
+
+	>*
+	{
+		width: fit-content;
+
+		margin-top: 10px;
+
+		align-self: center;
+	}
+
+	
+	$timeInterval: 0.3;
+	$totalTime: 10;
+	$fadeOutTime: 1;
+    
+	@keyframes errorAnimation {
+		$timeInterval: 0.3;
+		$totalTime: 30;
+		$fadeOutTime: 1;
+		0% 
+		{
+			opacity: 1;
+		}
+		@for $i from 1 through 3
+		{
+			#{$timeInterval / $totalTime * $i * 100%}
+			{
+				@if $i%2 == 0
+				{
+					transform: translate(-20px, 0px);
+				}
+				@else
+				{
+					transform: translate(20px, 0px);
+				}
+				
+			}
+		}
+		#{$timeInterval / $totalTime * 4 * 100%}
+		{
+			transform: translate(-10px, 0px);
+		}
+		#{$timeInterval / $totalTime * 5 * 100%}
+		{
+			transform: translate(0px, 0px);
+		}
+
+		#{($totalTime - $fadeOutTime)/$totalTime * 100%}
+		{
+			opacity: 1;
+		}
+		100%
+		{
+			opacity: 0;
+		}
+	}
+
+	div
+	{
+		display: flex;
+		flex-flow: center;
+	}
+
+	#message
+	{
+		opacity: 0;
+	}
+	.alert
+	{
+
+		animation: errorAnimation $totalTime * 1s 1;
+		//animation-play-state: paused;
+	}
+
+}
+
+#background
+{
+	transition: transform;
+	transition-timing-function: ease;
+	transition-duration: 5s;
+	transform: scale(1) translate(0%,0%);
+
+	div
+	{
+		background-color: rgba(172, 186, 198, 0.7);
+		width: 100%;
+		height: 100%;
+	}
+	
+	img
+	{
+		min-width: 100%;
+		min-height: 100%;
+	}
+
+	.transition
+	{
+		transition: opacity;
+		transition-timing-function: ease;
+	}
+}
+
+#ridingResults
+{
+	display: grid;
+
+	grid-template-columns: 1/17*100% 10/17*100% 1/17*100% 5/17*100%;
+
+	grid-template-rows: 10vh 1fr 50vh 1fr 15vh;
+
+	grid-template-areas:
+		"header header header rightBar"
+		". . . rightBar"
+		". main . rightBar"
+		". . . rightBar"
+		"footer footer footer rightBar";
+
+	z-index: 4;
+
+	.content
+	{
+		width: 100%;
+		height: 100%;
+	}
+
+	#header
+	{
+		grid-area: header;
+		background: #9FAFB9;
+
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+		display: flex;
+
+		justify-content: space-between;
+
+		*
+		{
+			align-self: flex-end;
+
+			font-size: 3vh;
+
+			color: #2B3236;
+
+			padding-left: 5vw;
+			padding-right: 5vw;
+
+			margin-bottom: 2vh;
+		}
+
+		:last-child
+		{
+			border-left: solid 3px black;
+			padding-left: 0.5vw;
+		}
+	}
+
+	#main
+	{
+		grid-area: main;
+
+		display: flex;
+		flex-direction: row;
+		justify-content: space-evenly;
+
+		.candidate
+		{
+			height: 100%;
+			width: 200px;
+
+			display: grid;
+
+			border-left: solid 5px blue;
+
+			grid-template-columns: 10px 1fr 1fr;
+
+			grid-template-rows: auto 40% 20px 20% 25% auto;
+
+			grid-template-areas:
+				". . ."
+				". face ."
+				". face party"
+				". name name"
+				". vote vote"
+				". . .";
+
+			img
+			{
+				grid-area: face;
+
+				width: 100%;
+				height: 100%;
+			}
+
+			.party
+			{
+				grid-area: party;
+				justify-self: end;
+				
+				width: 90%;
+				height: 100%;
+
+				padding-left: 5px;
+
+				background-color: red;
+				color: white;
+
+				border-top-left-radius: 10px;
+				border-bottom-left-radius: 10px;
+			}
+
+			.name
+			{
+				grid-area: name;
+
+				color: #3e4d4d;
+
+				width: 90%;
+				height: 90%;
+
+				padding-top: 5%;
+
+				font-size: 5vh;
+			}
+
+			:not(.cover,.bottom)
+			{
+				z-index: 4;
+			}
+			
+			.cover
+			{
+				grid-row-start: 1;
+				grid-column-start: 1;
+				grid-row-end: 5;
+				grid-column-end: last;
+				width: 100%;
+				height: 100%;
+
+				background: linear-gradient(45deg, rgba(255,255,255,0.75) 0%, rgba(100,100,100,0.5) 100%);
+			}
+
+			.bottom
+			{
+			    grid-row-start: 5;
+				grid-column-start: 1;
+				grid-row-end: last;
+				grid-column-end: last;
+				background-color: rgba(104,110,122,0.75);
+
+			}
+
+			.vote
+			{
+				grid-area: vote;
+
+				display: flex;
+
+				width: 100%;
+				height: 90%;
+
+				margin-top: 5%;
+
+				*
+				{
+					height: 100%;
+					width: 50%;
+				}
+
+				.percent
+				{
+					display: flex;
+
+					flex-direction: column;
+
+					color: white;
+
+					border-right: solid 2px #3e4d4d;
+
+					h1
+					{
+						margin-left: 10%;
+						text-align: center;
+					}
+
+					#progressBar
+					{
+						width: 90%;
+						height: 10px;
+
+						background-color: #3e4d4d;
+
+						.progress
+						{
+							width: 70%;
+							background: black
+						}
+						
+					}
+
+				}
+
+				.voteCount.winner
+				{
+					margin-left: 5%;
+				}
+
+				.voteCount
+				{
+					display: flex;
+
+					flex-direction: column;
+
+					justify-content: space-evenly;
+
+					margin-left: 15%;
+
+					*
+					{
+						width: fit-content;
+						height: fit-content;
+
+						color: white;
+
+						margin-top: 0%;
+						margin-bottom: 0%;
+					}
+				}
+			}
+
+		}
+	}
+
+	#rightBar
+	{
+		$rightBarBackGroundColour : rgba(38,49,64,1);
+		$mainColour: rgb(191, 200, 211);
+		$secondaryColour: rgb(86, 99, 110);
+
+		$primaryWidth: 85%;
+
+		grid-area: rightBar;
+		background: linear-gradient(0deg, $secondaryColour * 0.6 76.15vh, $rightBarBackGroundColour 76.15vh);
+
+		padding-left: 5px;
+		width: calc(100% - 5px);;
+
+		display: flex;
+		flex-direction: column;
+
+		#logo
+		{
+			height: 10vh;
+
+			display: flex;
+			justify-content: center;
+
+			margin-top: 3vh;
+			margin-bottom: 5vh;
+
+			*
+			{
+				align-self: center;
+			}
+			img
+			{
+				height: 100%;
+				width: auto;
+			}
+			div
+			{
+				display: block;
+				position: relative;
+
+				margin-left: 0.1vw;
+				
+				align-self: flex-end;
+				div
+				{
+					color: white;
+				}
+				
+				div:first-child
+				{
+					font-size: 7vh;
+					
+					padding-top: 1vh;
+					padding-bottom: 1vh;
+
+					padding-left: 1vw;
+					padding-right: 1vw;
+
+					border-top: solid white 2px;
+					border-bottom: solid white 2px;
+				}
+
+				div:last-child
+				{
+					position: absolute;
+
+					width: fit-content;
+
+					padding-left: 2vw;
+					padding-right: 2vw;
+
+					font-size: 2vh;
+					
+					bottom: -1vh;
+					left: 50%;
+					transform: translate(-50%, 0);
+
+					background-color: $rightBarBackGroundColour;
+					
+				}
+			}
+		}
+
+		#secondaryPoll
+		{
+			width: 100%;
+
+			#reportingPolls
+			{
+				color: white;
+			
+				font-size: 4vh;
+				margin-left: 10px;
+			}
+
+			#ridingName
+			{
+				width: 100%;
+				height: 5vh;
+
+				background-color: $mainColour;
+
+				font-size: 3vh;
+
+				padding-left: 10px;
+				padding-top: 3px;
+				padding-bottom: 7px;
+
+				margin-top: 10px;
+			}
+
+			.candidates
+			{
+				height: 50vh;
+
+				.candidate
+				{
+					height: 12.5vh;
+					width: $primaryWidth;
+
+					display: grid;
+
+					grid-template-columns: 12.5vh auto;
+
+					grid-template-rows: 1fr 1fr 1fr;
+					
+
+					grid-template-areas:
+						"face party"
+						"face name"
+						"face vote";
+
+					border-radius: 10px;
+
+					margin-top: 10px;
+
+					background-color: $mainColour;
+
+					overflow: hidden;
+
+					img
+					{
+						grid-area: face;
+
+						height: 100%;
+						width: auto;
+					}
+
+					>div
+					{
+						width: 100%;
+						height: 100%;
+
+						display: flex;
+						justify-content: space-between;
+
+						>div
+						{
+							align-self: center;
+
+							margin-left: 5px;
+							margin-right: 15px;
+
+							font-size: 2.3vh;
+						}
+					}
+
+					#party
+					{
+						grid-area: party;
+
+						color: $mainColour;
+
+						border-top-left-radius: 5px;
+						border-bottom-left-radius: 5px;
+					}
+
+					#name
+					{
+						background-color: $mainColour;
+						color: $secondaryColour;
+					}
+
+					#vote
+					{
+						background-color: $secondaryColour;
+
+						color: $mainColour;
+					}
+
+
+				}
+				.candidate:first-child
+				{
+					height: 20vh;
+					width: 100%;
+
+    				grid-template-columns: 20vh auto;
+
+					border-top-right-radius: 0px;
+					border-bottom-right-radius: 0px;
+				}
+			}
+		}
+
+		#majorityMeter
+		{
+			height: 12.5vh;
+			width: $primaryWidth;
+
+			margin-top: 10%;
+
+			border-radius: 10px;
+
+			position: relative;
+
+			background-color: $mainColour * 1.2;
+
+			$marginLeft: 10px;
+			$marginTop: 5%;
+
+			#overlay
+			{
+				position: absolute;
+
+				top: 0;
+				left: 0;
+
+				height: 100%;
+				width: 100%;
+
+				display: grid;
+
+				grid-template-columns: 65% 35%;
+				grid-template-rows: 30% 70%;
+
+				color: $secondaryColour;
+
+				div
+				{
+					margin-left: $marginLeft;
+					margin-right: 10px;
+					margin-top: $marginTop;
+
+					font-size: 2.5vh;
+				}
+
+				#bar
+				{
+					width: 2px;
+					margin: 0px;
+					height: 90%;
+					
+					grid-column-start: 2;
+
+					background-color: $secondaryColour;
+				}
+			}
+			#polling
+			{
+				height: 70%;
+				width: 90%;
+
+				margin-top: 10%;
+
+				display: flex;
+
+				flex-direction: column;
+
+				justify-content: space-evenly;
+				
+				.progress
+				{
+					margin-left: $marginLeft * 1.5;
+
+					height: 5px;
+					width: 0%;
+					
+					background-color: green;
+				}
+			}
+		}
+	}
+
+	#footer
+	{
+		grid-area: footer;
+		background: rgb(29,41,53,255);
+
+		display: flex;
+
+		justify-content: center;
+
+		>*
+		{
+			align-self: center;
+			height: 10vh;
+		}
+
+		.party
+		{
+			background-color: purple;
+
+			display: flex;
+
+			flex-direction: column;
+
+			justify-content: space-around;
+
+			width: 10vh;
+
+			margin-left: 5vh;
+			margin-right: 5vh;
+
+			border-radius: 1vh;
+
+			>*
+			{
+				width: fit-content;
+				align-self: center;
+				text-align: center;
+				color: white;
+			}
+
+			.name
+			{
+
+			}
+
+			.seat
+			{
+				width: fit-content;
+				height: fit-content;
+
+				background-color: rgba(0,0,0,0.5);
+
+				padding: 10% 35%;
+			}
+		}
+
+		.separator
+		{
+			width: 2px;
+			background-color: #434b4e;
+		}
+	}
+}

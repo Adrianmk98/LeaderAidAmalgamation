@@ -8,6 +8,7 @@ TOOL_DESCRIPTIONS = {
     "Activity Checker": "Check which MPs commented on qualifying debate threads within a date range.",
     "Comment Reader": "Browse a thread's comments by author, with unparliamentary-language highlighting.",
     "Player Updater": "Pull the current roster from the Google Sheet and refresh players.txt.",
+    "Election Simulator": "Launch the CMHoC election-night livestream simulator in your browser.",
 }
 
 # Vote highlight colors shared by VoteAnalyzer/voteanalyzerMain.py and VoteAnalyzer/sortingData.py

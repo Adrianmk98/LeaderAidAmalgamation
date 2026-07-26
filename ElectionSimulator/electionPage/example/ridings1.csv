@@ -1,0 +1,24 @@
+2	5	529320	Toronto
+CON	1.jpg	AGamerPwr	0	56	100	586	3600			
+LIB	1.jpg	Test2	10	45	850	1000	3500			
+NDP	1.jpg	Tester3	25	68	397	2368	2400	
+3	3	529320	Brampton
+CON	1.jpg	Name	0	56	100	586	862			
+LIB	1.jpg	Name	10	45	850	1000	3500			
+NDP	1.jpg	Name	25	68	397	2368	2400	
+4	8	529320	Mississauga
+CON	1.jpg	Name	0	56	100	586	862			
+LIB	1.jpg	Name	10	45	850	1000	3500			
+NDP	1.jpg	Name	25	68	397	2368	2400		
+5	7	529320	Sudbury
+CON	1.jpg	Name	0	56	100	586	862			
+LIB	1.jpg	Name	10	45	850	1000	3500			
+NDP	1.jpg	Name	25	68	397	2368	2400		
+6	1	529320	London
+CON	1.jpg	Name	0	56	100	586	862			
+LIB	1.jpg	Name	10	45	850	1000	3500			
+NDP	1.jpg	Name	25	68	397	2368	2400		
+7	2	529320	Ottawa
+CON	1.jpg	Name	0	56	100	586	862			
+LIB	1.jpg	Name	10	45	850	1000	3500			
+NDP	1.jpg	Name	25	68	397	2368	2400	

@@ -6,6 +6,7 @@ from ttkthemes import ThemedTk
 from activityChecker import activitycheckMain
 from VoteAnalyzer import voteanalyzerMain
 from commentReader import commentreaderMain
+from ElectionSimulator import electionsimulatorMain
 
 from config import setupCheck
 from dropDown.helpWindow import MainHelpWindow
@@ -47,6 +48,9 @@ def open_playerupdater():
     from playerUpdater import playerUpdaterMain
     playerUpdaterMain.main()
 
+def open_electionsimulator():
+    electionsimulatorMain.main()
+
 # Tool cards: display name, description key, logo file, subsample factor (to shrink 256/467px logos
 # down to a consistent ~50px icon), and the launcher function.
 TOOLS = [
@@ -54,6 +58,7 @@ TOOLS = [
     ("Vote Analyzer", "logos/logoblue.png", 5, open_voteanalyzer),
     ("Comment Reader", "logos/logoblue.png", 5, open_commentreader),
     ("Player Updater", "logos/logogreen.png", 9, open_playerupdater),
+    ("Election Simulator", "ElectionSimulator/electionPage/imgs/CMHoC_Logo.png", 13, open_electionsimulator),
 ]
 
 # Create the main window
