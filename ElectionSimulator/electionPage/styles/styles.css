@@ -417,4 +417,359 @@ body {
 	 width: 2px;
 	 background-color: #434b4e;
 }
+/* ===== Control Panel ===== */
+ #controlPanel {
+	 display: none;
+	 z-index: 6;
+	 background-color: #f4f6f8;
+	 flex-direction: column;
+	 box-sizing: border-box;
+	 color: #2b3236;
+	 font-size: 14px;
+}
+ #controlPanel h1, #controlPanel h2, #controlPanel h3 {
+	 margin: 0;
+	 font-weight: 700;
+}
+ #controlPanel h1 {
+	 font-size: 22px;
+}
+ #controlPanel h2 {
+	 font-size: 15px;
+	 margin-bottom: 10px;
+}
+ #controlPanel h3 {
+	 font-size: 13px;
+	 color: #666;
+	 text-transform: uppercase;
+	 letter-spacing: 0.03em;
+	 margin-bottom: 6px;
+}
+ #controlPanel .hint {
+	 color: #777;
+	 font-size: 12px;
+	 margin: 0 0 10px 0;
+}
+ #controlPanelHeader {
+	 flex: 0 0 auto;
+	 padding: 16px 24px;
+	 background: white;
+	 border-bottom: solid 1px #e2e5e8;
+}
+ #controlPanelHeader .subtitle {
+	 margin: 4px 0 0 0;
+	 color: #666;
+	 font-size: 13px;
+}
+ #controlPanelBody {
+	 flex: 1 1 auto;
+	 overflow-y: auto;
+	 display: grid;
+	 grid-template-columns: 1.15fr 0.85fr;
+	 gap: 20px;
+	 padding: 20px 24px;
+	 align-items: start;
+}
+ #ridingStatsPanel {
+	 grid-column: 1 / -1;
+}
+ @media (max-width: 1000px) {
+	 #controlPanelBody {
+		 grid-template-columns: 1fr;
+	}
+	 #controlPanelRight .panel {
+		 position: static !important;
+	}
+}
+ #controlPanel .panel {
+	 background: white;
+	 border: solid 1px #e2e5e8;
+	 border-radius: 10px;
+	 padding: 16px 18px;
+	 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	 margin-bottom: 20px;
+}
+ #controlPanel .panelHeaderRow {
+	 display: flex;
+	 align-items: center;
+	 justify-content: space-between;
+	 gap: 10px;
+	 margin-bottom: 6px;
+	 flex-wrap: wrap;
+}
+ #controlPanel .panelHeaderRow h2 {
+	 margin-bottom: 0;
+}
+ #controlPanel canvas {
+	 max-width: 100%;
+}
+ #controlPanel #chartLegend {
+	 margin-bottom: 8px;
+	 font-size: 12px;
+}
+/* Riding stats table */
+ #controlPanel #statsTableWrapper {
+	 max-height: 30vh;
+	 overflow: auto;
+	 border: solid 1px #e2e5e8;
+	 border-radius: 6px;
+}
+ #controlPanel #statsTable {
+	 border-collapse: collapse;
+	 width: 100%;
+	 font-size: 13px;
+}
+ #controlPanel #statsTable th, #controlPanel #statsTable td {
+	 padding: 6px 10px;
+	 text-align: left;
+	 border-bottom: solid 1px #eef0f2;
+	 white-space: nowrap;
+}
+ #controlPanel #statsTable thead, #controlPanel #statsTable tr:first-child {
+	 position: sticky;
+	 top: 0;
+	 background: #fafbfc;
+	 z-index: 1;
+}
+ #controlPanel #statsTable th.sortable {
+	 cursor: pointer;
+	 user-select: none;
+}
+ #controlPanel #statsTable th.sortable:hover {
+	 background: #eef1f4;
+}
+ #controlPanel .statsRow {
+	 cursor: pointer;
+}
+ #controlPanel .statsRow:hover {
+	 background: #f5f9ff;
+}
+ #controlPanel .statsRow.selected {
+	 background: #dbeeff;
+	 font-weight: 700;
+}
+/* Running order lists */
+ #controlPanel #scheduleColumns {
+	 display: grid;
+	 grid-template-columns: 1fr 1fr;
+	 gap: 16px;
+}
+ #controlPanel .scheduleList {
+	 max-height: 32vh;
+	 overflow-y: auto;
+	 border: solid 1px #e2e5e8;
+	 border-radius: 6px;
+}
+ #controlPanel .scheduleRow {
+	 display: flex;
+	 align-items: center;
+	 gap: 6px;
+	 padding: 5px 8px;
+	 border-bottom: solid 1px #f0f0f0;
+}
+ #controlPanel .scheduleRow:nth-child(even) {
+	 background: #fafbfc;
+}
+ #controlPanel .scheduleRow.selected {
+	 background: #dbeeff;
+}
+ #controlPanel .scheduleTime {
+	 color: #999;
+	 font-size: 12px;
+	 width: 40px;
+	 flex: 0 0 auto;
+}
+ #controlPanel .scheduleRiding {
+	 flex-grow: 1;
+	 cursor: pointer;
+	 padding: 2px 6px;
+	 border-radius: 4px;
+}
+ #controlPanel .scheduleRiding:hover {
+	 background: #eef6ff;
+	 color: #1a5fa8;
+}
+ #controlPanel .scheduleRow.selected .scheduleRiding {
+	 font-weight: 700;
+	 color: #1a5fa8;
+}
+ #controlPanel .scheduleRow input[type="button"] {
+	 width: 24px;
+	 height: 24px;
+	 padding: 0;
+	 line-height: 1;
+	 border: solid 1px #ddd;
+	 border-radius: 5px;
+	 background: white;
+	 cursor: pointer;
+	 font-size: 10px;
+	 flex: 0 0 auto;
+}
+ #controlPanel .scheduleRow input[type="button"]:hover {
+	 background: #f0f0f0;
+}
+/* Step editor */
+ #controlPanelRight .panel {
+	 position: sticky;
+	 top: 0;
+}
+ #controlPanel #stepEditorRidingLabel {
+	 font-size: 16px;
+	 font-weight: 700;
+	 margin-bottom: 10px;
+}
+ #controlPanel #stepEditorJumpList {
+	 display: flex;
+	 flex-wrap: wrap;
+	 gap: 6px;
+	 max-height: 110px;
+	 overflow-y: auto;
+	 margin-bottom: 12px;
+	 padding-bottom: 4px;
+	 border-bottom: solid 1px #eef0f2;
+}
+ #controlPanel .ridingChip {
+	 padding: 4px 11px;
+	 border-radius: 999px;
+	 background: #eef1f4;
+	 font-size: 12px;
+	 cursor: pointer;
+	 border: solid 1px transparent;
+	 white-space: nowrap;
+}
+ #controlPanel .ridingChip:hover {
+	 background: #e2e8ee;
+}
+ #controlPanel .ridingChip.selected {
+	 background: #44a08d;
+	 color: white;
+}
+ #controlPanel #stepChartLegend {
+	 font-size: 12px;
+	 margin-bottom: 6px;
+}
+ #controlPanel #stepChart {
+	 max-width: 100%;
+	 margin-bottom: 12px;
+}
+ #controlPanel #stepEditorGlobalActions {
+	 margin-top: 14px;
+	 padding-top: 12px;
+	 border-top: solid 1px #eef0f2;
+	 display: flex;
+	 align-items: center;
+	 gap: 10px;
+}
+ #controlPanel #stepEditorGlobalActions .hint {
+	 margin: 0;
+}
+ #controlPanel #stepEditorControls {
+	 display: flex;
+	 align-items: center;
+	 flex-wrap: wrap;
+	 gap: 8px;
+	 margin-bottom: 10px;
+	 font-size: 12px;
+	 color: #555;
+}
+ #controlPanel #stepEditorFrom, #controlPanel #stepEditorTo {
+	 width: 50px;
+}
+ #controlPanel #stepEditorTableWrapper {
+	 max-height: 40vh;
+	 overflow: auto;
+	 border: solid 1px #e2e5e8;
+	 border-radius: 6px;
+}
+ #controlPanel #stepEditorTable {
+	 border-collapse: collapse;
+	 width: 100%;
+	 font-size: 13px;
+}
+ #controlPanel #stepEditorTable th, #controlPanel #stepEditorTable td {
+	 border: solid 1px #eef0f2;
+	 padding: 5px 6px;
+	 text-align: center;
+	 white-space: nowrap;
+}
+ #controlPanel #stepEditorTable tr:first-child th {
+	 position: sticky;
+	 top: 0;
+	 background: #fafbfc;
+	 z-index: 2;
+}
+ #controlPanel #stepEditorTable tr:nth-child(even) {
+	 background: #fafbfc;
+}
+ #controlPanel #stepEditorTable td:first-child, #controlPanel #stepEditorTable th:first-child {
+	 text-align: left;
+	 position: sticky;
+	 left: 0;
+	 background: inherit;
+	 z-index: 1;
+}
+ #controlPanel #stepEditorTable input {
+	 width: 68px;
+	 border: solid 1px #ddd;
+	 border-radius: 4px;
+	 padding: 2px 4px;
+	 text-align: right;
+}
+ #controlPanel #stepEditorTable input:focus {
+	 outline: none;
+	 border-color: #44a08d;
+	 box-shadow: 0 0 0 2px rgba(68, 160, 141, 0.2);
+}
+ #controlPanel #stepEditorTable input.stepLocked {
+	 background: #f0f0f0;
+	 color: #999;
+	 border-color: #e2e5e8;
+	 cursor: not-allowed;
+}
+/* Buttons */
+ #controlPanel .btn {
+	 border: none;
+	 border-radius: 8px;
+	 padding: 9px 16px;
+	 font-weight: 700;
+	 font-size: 13px;
+	 cursor: pointer;
+	 transition: box-shadow 0.15s ease, transform 0.05s ease;
+}
+ #controlPanel .btn:hover {
+	 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+ #controlPanel .btn:active {
+	 transform: scale(0.97);
+}
+ #controlPanel .btn-secondary {
+	 background: #eef1f4;
+	 color: #333;
+}
+ #controlPanel .btn-primary {
+	 background: linear-gradient(45deg, #4ecdc4, #44a08d);
+	 color: white;
+}
+ #controlPanel .btn-accent {
+	 background: linear-gradient(45deg, #6a82fb, #fc5c7d);
+	 color: white;
+}
+/* Sticky action footer */
+ #controlPanel #controlPanelActions {
+	 flex: 0 0 auto;
+	 display: flex;
+	 align-items: center;
+	 justify-content: space-between;
+	 gap: 15px;
+	 padding: 14px 24px;
+	 background: white;
+	 border-top: solid 1px #e2e5e8;
+	 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+}
+ #controlPanel #videoCompileStatus {
+	 flex: 1 1 auto;
+	 font-size: 12px;
+	 color: #666;
+	 text-align: center;
+}
  

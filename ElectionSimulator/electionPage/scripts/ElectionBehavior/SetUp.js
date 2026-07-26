@@ -120,11 +120,7 @@ class SetUp
 			Main.setPrimaryDuration(this.#calcTime(this.primaryTimeFeild.val.val(),this.primaryTimeFeild.unit.val()))
 			Main.setSecondaryDuration(this.#calcTime(this.secondaryTimeFeild.val.val(),this.secondaryTimeFeild.unit.val()))
 
-			this.#startCountDown(10)
-
-			console.log(returnVal)
-			
-			return returnVal;
+			ControlPanel.show(Main.getParties(), Main.getRidings(), Main.getPrimaryDuration(), Main.getSecondaryDuration(), this.#goLive.bind(this))
 		}
 		catch(exception)
 		{
@@ -132,6 +128,18 @@ class SetUp
 			this.#sendMessage(exception.toString())
 			this.#intiateIterator()
 		}
+	}
+
+	/**
+	 * #goLive is called once the moderator confirms the Control Panel's running order; installs
+	 * the finalized schedule on Main and starts the countdown into the live broadcast.
+	 *
+	 * @param {Object} schedule finalized {primary, secondary, endTime} schedule from ControlPanel
+	 */
+	#goLive(schedule)
+	{
+		Main.setSchedule(schedule)
+		this.#startCountDown(10)
 	}
 
 	/**

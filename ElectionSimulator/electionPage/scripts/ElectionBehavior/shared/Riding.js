@@ -166,7 +166,8 @@ class Riding
 			throw new Exception("IlligalArguments", "candidate must be an array or canadidate object")
 		}
 
-		var maxTime = (this.#candidates[this.#candidates.length - 1] - 1) * this.#deltaTime
+		var lastCandidate = this.#candidates[this.#candidates.length - 1]
+		var maxTime = (lastCandidate.getVoteCount().length - 1) * this.#deltaTime
 
 		if(maxTime > this.#endTime)
 		{
@@ -203,7 +204,20 @@ class Riding
 	{
 		return this.#startTime
 	}
-	
+
+	/**
+	 * setStartTime overwrites the absolute time (seconds since the livestream start) at which this
+	 * riding begins counting - used by the Control Panel's Reporting Order to let a moderator
+	 * reassign which riding's results play out in which time slot without touching any vote data
+	 * (the steps and their final value are untouched; only when they play out shifts).
+	 *
+	 * @param {float} time
+	 */
+	setStartTime(time)
+	{
+		this.#startTime = time
+	}
+
 	/**
 	 * getDeltaTime returns the number of seconds between updates
 	 *
@@ -240,6 +254,17 @@ class Riding
 		return candidateVote
 	}
 	
+	/**
+	 * getEndTime returns the absolute time (seconds since the livestream start) at which this
+	 * riding finishes counting all of its polling batches.
+	 *
+	 * @return {float} absolute end time
+	 */
+	getEndTime()
+	{
+		return this.#startTime + this.#endTime
+	}
+
 	/**
 	 * countingCheck checks if the riding is still counting
 	 *

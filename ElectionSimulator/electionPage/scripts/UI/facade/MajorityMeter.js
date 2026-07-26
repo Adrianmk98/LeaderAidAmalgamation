@@ -41,30 +41,14 @@ class MajorityMeter extends Facade
 	 */
 	update(ridings, time)
 	{
-		var seatCounts = {}
+		var seatCounts = SeatTally.compute(ridings, time)
 
-		// Initialize seat counts for all parties
+		// Initialize seat counts for all parties not currently holding a seat
 		for(var i1 = 0; i1 < MajorityMeter.#allParties.length; i1++)
 		{
-			seatCounts[MajorityMeter.#allParties[i1]] = 0;
-		}
-
-		var winner;
-		for(var i1 = 0; i1 < ridings.length; i1++)
-		{
-			ridings[i1].getCandidateVote(time)
-			winner = ridings[i1].getWinner()
-
-			for(var i2 = 0; i2 < winner.length; i2++)
+			if(seatCounts[MajorityMeter.#allParties[i1]] === undefined)
 			{
-				if(seatCounts[winner[0]] == undefined)
-				{
-					seatCounts[winner[0]] = 1
-				}
-				else
-				{
-					seatCounts[winner[0]] += 1
-				}
+				seatCounts[MajorityMeter.#allParties[i1]] = 0;
 			}
 		}
 

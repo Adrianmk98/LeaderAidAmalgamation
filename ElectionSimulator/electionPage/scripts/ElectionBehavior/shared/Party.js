@@ -134,6 +134,16 @@ class Party
 	}
 	
 	/**
+	 * returns the string for colour
+	 *
+	 * @return {String} colour value
+	 */
+	getColour()
+	{
+		return this.#colour
+	}
+
+	/**
 	 * updateElements updates the colour format of all html elements with key id
 	 */
 	updateElements()

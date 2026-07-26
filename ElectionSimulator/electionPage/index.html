@@ -42,33 +42,96 @@
 		<div id="message">
 		</div>
 	</div>
-	<!-- Add this after your setup div -->
-<div id="controlButton" style="display:none; position:fixed; top:10px; right:10px; z-index:9999;">
-    <button onclick="openControlPanel()" style="
-        background: linear-gradient(45deg, #4ecdc4, #44a08d);
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    ">
-        🎛️ Control Panel
-    </button>
-</div>
+	<div id="controlPanel" class="base">
+		<div id="controlPanelHeader">
+			<h1>Control Panel</h1>
+			<p class="subtitle">Preview how results will roll in, plan the running order, and hand-edit vote data before going live.</p>
+		</div>
 
-<script>
-function openControlPanel() {
-    window.open('control.html', 'ElectionControl', 
-        'width=450,height=900,resizable=yes,scrollbars=yes,location=no,menubar=no');
-}
+		<div id="controlPanelBody">
+			<div id="controlPanelLeft">
+				<div class="panel">
+					<h2>Seat Projection</h2>
+					<div id="chartLegend"></div>
+					<canvas id="seatProjectionChart" width="640" height="260"></canvas>
+				</div>
 
-// Show control button when setup is complete
-function showControlButton() {
-    document.getElementById('controlButton').style.display = 'block';
-}
-</script>
+				<div class="panel">
+					<div class="panelHeaderRow">
+						<h2>Reporting Order</h2>
+						<input type="button" id="rerollReportingOrderBtn" class="btn btn-secondary" value="Reroll Reporting Order">
+					</div>
+					<p class="hint">When each riding's results are actually decided in real broadcast time - this is what shapes the Seat Projection chart above. Reordering shifts <em>when</em> a riding's results play out; each riding's own steps (and final result) never change. Click a riding's name to load it in the step editor.</p>
+					<div id="reportingOrderList" class="scheduleList"></div>
+				</div>
+
+				<div class="panel">
+					<div class="panelHeaderRow">
+						<h2>Running Order</h2>
+						<input type="button" id="rerollScheduleBtn" class="btn btn-secondary" value="Reroll Random Order">
+					</div>
+					<p class="hint">Which riding the Primary/Secondary broadcast panel shows at a given moment - a display choice only, it doesn't affect the chart above. Click a riding's name to load it in the step editor. Use ▲ ▼ to change when it airs.</p>
+					<div id="scheduleColumns">
+						<div class="scheduleColumn">
+							<h3>Primary</h3>
+							<div id="primaryScheduleList" class="scheduleList"></div>
+						</div>
+						<div class="scheduleColumn">
+							<h3>Secondary</h3>
+							<div id="secondaryScheduleList" class="scheduleList"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="controlPanelRight">
+				<div class="panel" id="stepEditor">
+					<h2>Edit Riding Steps</h2>
+					<div id="stepEditorRidingLabel">No riding selected</div>
+
+					<div id="stepEditorJumpList"></div>
+
+					<div id="stepChartLegend"></div>
+					<canvas id="stepChart" width="560" height="180"></canvas>
+
+					<div id="stepEditorControls">
+						<label>Reroll steps <input type="number" id="stepEditorFrom" min="1" value="1"> to <input type="number" id="stepEditorTo" min="1" value="1"></label>
+						<input type="button" id="stepEditorRerollRangeBtn" class="btn btn-secondary" value="Reroll Selected">
+						<input type="button" id="stepEditorRerollAllBtn" class="btn btn-secondary" value="Reroll All (This Riding)">
+					</div>
+					<div id="stepEditorTableWrapper">
+						<table id="stepEditorTable"></table>
+					</div>
+
+					<div id="stepEditorGlobalActions">
+						<input type="button" id="rerollAllRidingsBtn" class="btn btn-accent" value="Reroll All Ridings">
+						<p class="hint">Rerolls every riding's steps at once (final results still locked).</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel" id="ridingStatsPanel">
+				<div class="panelHeaderRow">
+					<h2>Riding Stats</h2>
+					<label class="hint">Late margin measured from step <input type="number" id="statsMinStep" min="1" value="5" style="width:45px;"> onward</label>
+				</div>
+				<p class="hint">Click a column to sort, click a row to load that riding in the step editor.</p>
+				<div id="statsTableWrapper">
+					<table id="statsTable"></table>
+				</div>
+			</div>
+		</div>
+
+		<div id="controlPanelActions">
+			<input type="button" id="compileVideoBtn" class="btn btn-accent" value="🎬 Compile Video">
+			<div id="videoCompileStatus"></div>
+			<input type="button" id="confirmScheduleBtn" class="btn btn-primary" value="Confirm &amp; Go Live">
+		</div>
+	</div>
+	<div id="videoExportButton" style="position:fixed; top:10px; right:10px; z-index:9999;">
+		<input type="button" id="compileVideoBtnLive" value="🎬 Compile Video">
+		<div id="videoCompileStatusLive"></div>
+	</div>
 	<div id="ridingResults" class="base">
 		<div id="header" class="content">
 			<div>
@@ -140,24 +203,41 @@ function showControlButton() {
 	<script src="scripts/ElectionBehavior/shared/Party.js"></script>
 	<script src="scripts/ElectionBehavior/shared/Exception.js"></script>
 	<script src="scripts/ElectionBehavior/shared/RidingPools.js"></script>
+	<script src="scripts/ElectionBehavior/shared/SeatTally.js"></script>
+	<script src="scripts/ElectionBehavior/shared/RidingStats.js"></script>
 	<script src="scripts/ElectionBehavior/shared/winnerCalculator/WinnerCalculator.js"></script>
 	<script src="scripts/ElectionBehavior/shared/winnerCalculator/FirstPastThePost.js"></script>
+	<script src="scripts/ElectionBehavior/Scheduler.js"></script>
 
 	<!-- UI scripts -->
-	<script src="scripts/UI/facade/Facade.js"></script>	
+	<script src="scripts/UI/facade/Facade.js"></script>
 	<script src="scripts/UI/backgroundHandler.js"></script>
 	<script src="scripts/UI/facade/PrimaryPolling.js"></script>
 	<script src="scripts/UI/facade/SecondaryPolling.js"></script>
 	<script src="scripts/UI/facade/SeatCount.js"></script>
 	<script src="scripts/UI/facade/MajorityMeter.js"></script>
-	
+	<script src="scripts/UI/ControlPanel.js"></script>
+	<script type="module" src="scripts/UI/VideoCompiler.js"></script>
+
 	<!-- SetUp -->
 	<script src="scripts/ElectionBehavior/CSVParser.js"></script>
 	<script src="scripts/ElectionBehavior/SetUp.js"></script>
-	
+
 	<!-- Main -->
 	<script src="scripts/ElectionBehavior/Main.js"></script>
-	
+
+	<script>
+		document.getElementById("compileVideoBtnLive").addEventListener("click", function()
+		{
+			var schedule = Main.getSchedule()
+			if(schedule === null)
+			{
+				$("#videoCompileStatusLive").text("No finalized schedule yet - confirm the Control Panel running order first.")
+				return
+			}
+			VideoCompiler.compile(Main.getParties(), Main.getRidings(), schedule, $("#videoCompileStatusLive"))
+		})
+	</script>
 
 	<!-- Election  -->
 

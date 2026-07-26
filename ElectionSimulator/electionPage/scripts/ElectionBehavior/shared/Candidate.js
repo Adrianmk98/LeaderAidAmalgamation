@@ -239,6 +239,18 @@ class Candidate
 	}
 
 	/**
+	 * setVoteCountAt overwrites a single step's cumulative vote count - used by the Control
+	 * Panel's step editor to let a moderator hand-edit or reroll individual polling steps.
+	 *
+	 * @param {integer} index step index to overwrite
+	 * @param {integer} value new cumulative vote count
+	 */
+	setVoteCountAt(index, value)
+	{
+		this.#voteCount[index] = value
+	}
+
+	/**
 	 * #getVoteCount3 returns the vote count at a given step
 	 *
 	 * @param {float} time value of the interpolated values
