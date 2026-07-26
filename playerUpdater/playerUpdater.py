@@ -8,48 +8,53 @@ DOCUMENTATION
  	It takes the users from a spreadsheet and if there are any empty pieces of information it will go through the process of adapting it for further use.
 
 '''
+import configparser
+
 import gspread
 from google.oauth2.service_account import Credentials
 from cryptography.fernet import Fernet
 import json
 
-#Loads the encrypted key for using the google API from secret.key
-def load_encrypted_json():
-    with open("secret.key", "rb") as key_file:
-        key = key_file.read()
+from playerUpdater.loadEncrypedCode import load_encrypted_json
+from includes.playerDB import import_from_rows
 
-    with open("autoupdater.json.enc", "rb") as enc_file:
-        encrypted_data = enc_file.read()
 
-    fernet = Fernet(key)
-    decrypted_data = fernet.decrypt(encrypted_data).decode()
+def _location_config():
+    config = configparser.ConfigParser()
+    config.read('config/locationOfTxt.ini')
+    return config
 
-    return json.loads(decrypted_data)
 
 #Loads list of old players for votes which take place with a different set of MPs than the current
+#Reads the *current* players.txt, before this run overwrites it, so removed players can be diffed
 def load_old_players():
+    player_file = _location_config()['player']['playerFile']
     try:
-        with open('playerFiles/players.txt', 'r') as f:
+        with open(player_file, 'r') as f:
             return set(f.read().splitlines())
     except FileNotFoundError:
         return set()
 
 #Any removed players from players.txt are added to the oldplayer.txt file
 def update_oldplayers_file(removed_players):
-    with open('playerFiles/oldplayer.txt', 'a') as f:
+    oldplayer_file = _location_config()['oldplayer']['oldplayerFile']
+    with open(oldplayer_file, 'a') as f:
         for player in removed_players:
             f.write(player + "\n")
 
 
-def playerUpdater():
+def playerUpdater(log=print):
+    log("Decrypting Google service-account credentials...")
     creds_data = load_encrypted_json()
     creds = Credentials.from_service_account_info(creds_data, scopes=["https://www.googleapis.com/auth/spreadsheets",
                                                                       "https://www.googleapis.com/auth/drive"])
 
+    log("Authorizing with Google Sheets...")
     client = gspread.authorize(creds)
     spreadsheet_key = "X"
     sheet = client.open_by_key(spreadsheet_key).worksheet("Voting Records")
 
+    log("Fetching \"Voting Records\" worksheet...")
     # Get all data from the specified columns, starting from row 6
     data = sheet.get_all_values()[3:]  # Start from row 6
 
@@ -74,14 +79,19 @@ def playerUpdater():
     removed_players = set(old_players) - set(new_players)
 
     # Update players.txt with ordered new players
-    with open('playerFiles/players.txt', 'w') as f:
+    player_file = _location_config()['player']['playerFile']
+    with open(player_file, 'w') as f:
         f.write("\n".join(new_players))
+
+    # Rebuild players.db from the same in-memory rows, so txt and DB never disagree
+    log("Rebuilding player database...")
+    import_from_rows(new_players)
 
     # Update oldplayer.txt with removed players
     if removed_players:
         update_oldplayers_file(removed_players)
 
-    print(f"players.txt has been updated! {len(removed_players)} players removed.")
+    log(f"players.txt has been updated! {len(new_players)} players written, {len(removed_players)} removed.")
 
 
 if __name__ == "__main__":

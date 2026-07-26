@@ -1,0 +1,4 @@
+[reddit]
+client_id = your_client_id_here
+client_secret = your_client_secret_here
+user_agent = script:cmhocApp:v1.0 (by /u/your_username)

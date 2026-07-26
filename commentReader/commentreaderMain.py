@@ -6,9 +6,12 @@ import re
 from ttkthemes import ThemedTk
 from datetime import datetime, timedelta
 
-from commentReader.CRplayerLoader import load_usernames
+import configparser
+
+from includes.playerDB import load_usernames
 from dropDown.helpWindow import CommentReaderHelpWindow
 from config.getRedditCreds import fetch_reddit_creds
+from dropDown import theme
 
 #Fetches recent posts from 'cmhoc' subreddit within the past number of days.
 def fetch_recent_posts(reddit,days):
@@ -175,7 +178,7 @@ def update_comments(event=None):
         lower_comment_body = comment_body.lower()
 
         # Highlight usernames
-        for username in load_usernames():
+        for username in known_usernames:
             # Use re.escape to safely handle special characters in the username
             escaped_username = re.escape(username)
             if re.search(rf'\b{escaped_username}\b', lower_comment_body):
@@ -309,7 +312,7 @@ def open_help_window():
 
 def open_keybinds_window(root):
     """Opens a window to set keybindings."""
-    keybind_window = ThemedTk(theme="yaru")
+    keybind_window = ThemedTk(theme=theme.THEME_NAME)
     keybind_window.title("Set Keybinds")
 
     # Label and dropdown for selecting an action to change the keybind
@@ -388,7 +391,7 @@ def open_keybinds_window(root):
 
 def main():
     global root, link_label, link_entry, fetch_button, user_label,user_dropdown,comments_list,comments_label,comments_dropdown,scrollbar,comment_display,read_button
-    global user_comments,read_comments,unparliamentary_words,checked_comments,keybindings,toggle_button,reddit
+    global user_comments,read_comments,unparliamentary_words,checked_comments,keybindings,toggle_button,reddit,known_usernames
     # GUI setup
     user_comments = {}
     checked_comments = {}
@@ -396,84 +399,101 @@ def main():
     reddit=fetch_reddit_creds()
     # Create the main Tk window
 
-    rootx = tk.Tk()
+    rootx = ThemedTk(theme=theme.THEME_NAME)
     rootx.withdraw()
-    root = tk.Toplevel()
+    root = tk.Toplevel(rootx)
     root.title("CMHoC Comments Reader")
-    logo = tk.PhotoImage(file="logos/logoblue.png")
+    root.geometry("900x650")
+    root.minsize(760, 520)
+    logo = tk.PhotoImage(file="logos/logoblue.png", master=root)
     root.iconphoto(True, logo)
+
+    theme.apply_theme(root)
 
     # Create a menu bar
     menu_bar = tk.Menu(root)
     root.config(menu=menu_bar)
 
-    # Load unparliamentary words from 'unparliamentary.txt' using utf-8 encoding
-    with open('CommentReader/unparliamentary.txt', 'r', encoding='utf-8') as file:
+    # Load unparliamentary words, via the same path indirection every other loader uses
+    location_config = configparser.ConfigParser()
+    location_config.read('config/locationOfTxt.ini')
+    unparliamentary_file = location_config['unparliamentary']['unparliamentaryFile']
+    with open(unparliamentary_file, 'r', encoding='utf-8') as file:
         unparliamentary_words = [line.strip().lower() for line in file]
 
-    # Load usernames from 'players.txt' and add them to the unparliamentary_words list
-    with open('playerFiles/players.txt', 'r', encoding='utf-8') as file:
-        for line in file:
-            clean_line = line.strip()
-            if clean_line and "vacant" not in clean_line.lower() and not clean_line.startswith("Party List"):
-                parts = clean_line.split('\t')
-                if len(parts) >= 3 and parts[1].lower() != "vacant":
-                    username = parts[1].strip().lower()
-                    unparliamentary_words.append(username)
+    # Load usernames once (used both for highlighting and the unparliamentary check)
+    known_usernames = load_usernames()
+    unparliamentary_words += [username.lower() for username in known_usernames]
 
-    # Input for Reddit link
-    link_label = tk.Label(root, text="Enter Reddit Link:")
-    link_label.grid(row=0, column=0, padx=10, pady=5)
+    ttk.Label(root, text="Comment Reader", style="Heading.TLabel").pack(anchor="w", padx=16, pady=(14, 0))
+    ttk.Label(
+        root, text=theme.TOOL_DESCRIPTIONS["Comment Reader"], style="Subheading.TLabel"
+    ).pack(anchor="w", padx=16, pady=(0, 8))
 
-    link_entry = tk.Entry(root, width=50)
-    link_entry.grid(row=0, column=1, padx=(10, 0), pady=5)  # Adjust padding for spacing
+    # --- Thread section ---
+    thread_frame = ttk.LabelFrame(root, text="Thread", padding=10)
+    thread_frame.pack(fill="x", padx=16, pady=(0, 8))
+
+    link_label = ttk.Label(thread_frame, text="Reddit Link:")
+    link_label.grid(row=0, column=0, padx=(0, 6), sticky="w")
+
+    link_entry = ttk.Entry(thread_frame, width=55)
+    link_entry.grid(row=0, column=1, sticky="we")
+    thread_frame.columnconfigure(1, weight=1)
 
     # Toggle button to lock/unlock the entry, positioned right next to the link entry
-    toggle_button = tk.Button(root, text="✅", command=toggle_editable, relief="flat")
-    toggle_button.grid(row=0, column=2, padx=(5, 10), pady=5)  # Add slight padding to separate from entry
+    toggle_button = ttk.Button(thread_frame, text="✅", command=toggle_editable, width=3)
+    toggle_button.grid(row=0, column=2, padx=(6, 0))
 
     # Fetch comments button
-    fetch_button = tk.Button(root, text="Fetch Comments", command=lambda: fetch_and_display())
-    fetch_button.grid(row=0, column=3, padx=10, pady=5)
-
-    # Dropdown for users
-    user_label = tk.Label(root, text="Select User:", )
-    user_label.grid(row=1, column=0, padx=10, pady=5)
-
-    user_dropdown = ttk.Combobox(root, state="readonly")
-    user_dropdown.bind("<<ComboboxSelected>>", update_users)
-    user_dropdown.grid(row=1, column=1, padx=10, pady=5)
-
-    # Listbox for comments
-    comments_list = tk.Listbox(root, width=80, height=10)
-    comments_list.grid(row=2, column=0, columnspan=3, padx=10, pady=5)
-    comments_list.bind("<<ListboxSelect>>", update_comments)
-
-    # Scrollbar for comment display
-    scrollbar = tk.Scrollbar(root)
-    scrollbar.grid(row=3, column=3, sticky='ns')
-
-    # Text widget to display selected comment
-    comment_display = tk.Text(root, wrap=tk.WORD, width=80, height=15, yscrollcommand=scrollbar.set, state=tk.DISABLED)
-    comment_display.grid(row=3, column=0, columnspan=3, padx=10, pady=5)
-
-    scrollbar.config(command=comment_display.yview)
-
-    # Button to mark as read
-    read_button = tk.Button(root, text="Mark as Read", command=mark_as_read)
-    read_button.grid(row=4, column=1, padx=10, pady=5, sticky='w')
-
-    # Button to open the comment in the browser
-    browser_button = tk.Button(root, text="Open in Browser", command=open_in_browser)
-    browser_button.grid(row=4, column=1, padx=10, pady=5, sticky='e')
+    fetch_button = ttk.Button(thread_frame, text="Fetch Comments", command=lambda: fetch_and_display())
+    fetch_button.grid(row=0, column=3, padx=(6, 0))
 
     # Button to load recent posts
-    load_recent_button = tk.Button(root, text="Load Recent Posts", command=open_recent_posts_window)
-    load_recent_button.grid(row=1, column=3, padx=10, pady=5)
+    load_recent_button = ttk.Button(thread_frame, text="Load Recent Posts", command=open_recent_posts_window)
+    load_recent_button.grid(row=0, column=4, padx=(6, 0))
 
-    user_comments = {}
-    checked_comments = {}
-    read_comments = {}
+    # Dropdown for users
+    user_label = ttk.Label(thread_frame, text="Select User:")
+    user_label.grid(row=1, column=0, padx=(0, 6), pady=(8, 0), sticky="w")
+
+    user_dropdown = ttk.Combobox(thread_frame, state="readonly")
+    user_dropdown.bind("<<ComboboxSelected>>", update_users)
+    user_dropdown.grid(row=1, column=1, pady=(8, 0), sticky="w")
+
+    # --- Comments / Selected Comment panes ---
+    panes = ttk.PanedWindow(root, orient=tk.HORIZONTAL)
+    panes.pack(fill="both", expand=True, padx=16, pady=(0, 8))
+
+    comments_frame = ttk.LabelFrame(panes, text="Comments", padding=8)
+    comment_frame = ttk.LabelFrame(panes, text="Selected Comment", padding=8)
+    panes.add(comments_frame, weight=1)
+    panes.add(comment_frame, weight=2)
+
+    # Listbox for comments
+    comments_list = tk.Listbox(comments_frame)
+    comments_list.pack(fill="both", expand=True)
+    comments_list.bind("<<ListboxSelect>>", update_comments)
+
+    # Text widget to display selected comment, with its own scrollbar
+    comment_display = tk.Text(comment_frame, wrap=tk.WORD, state=tk.DISABLED)
+    scrollbar = tk.Scrollbar(comment_frame, command=comment_display.yview)
+    comment_display.config(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side="right", fill="y")
+    comment_display.pack(side="left", fill="both", expand=True)
+
+    # --- Action toolbar ---
+    action_frame = ttk.Frame(root, padding=(16, 0, 16, 12))
+    action_frame.pack(fill="x")
+
+    # Button to mark as read
+    read_button = ttk.Button(action_frame, text="Mark as Read", command=mark_as_read)
+    read_button.pack(side="left")
+
+    # Button to open the comment in the browser
+    browser_button = ttk.Button(action_frame, text="Open in Browser", command=open_in_browser)
+    browser_button.pack(side="left", padx=6)
+
     drop_menu = tk.Menu(menu_bar, tearoff=0)
     menu_bar.add_cascade(label="File", menu=drop_menu)
     drop_menu.add_command(label="Keybind Settings", command=keybindsopening)
@@ -494,6 +514,8 @@ def main():
     root.bind("<Return>", fetch_and_display)
     root.bind("<Control-b>", open_in_browser)
     root.bind("<Control-m>", mark_as_read)
+
+    rootx.mainloop()
 
 if __name__ == "__main__":
     main()

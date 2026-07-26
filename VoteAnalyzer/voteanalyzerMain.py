@@ -1,6 +1,7 @@
 import tkinter as tk
 import webbrowser
 from tkinter import scrolledtext, messagebox, ttk
+from ttkthemes import ThemedTk
 import regex as re
 import datetime
 import pytz
@@ -10,7 +11,8 @@ from VoteAnalyzer.recentPostLoader import open_recent_posts_window
 from VoteAnalyzer.sortingData import sort_by_party, sort_by_type, sort_by_govPosition
 from config.getRedditCreds import fetch_reddit_creds
 from dropDown.helpWindow import VoteAnalyzerHelpWindow
-from VoteAnalyzer.VAplayerLoader import load_player_data
+from dropDown import theme
+from includes.playerDB import load_player_data
 
 
 #Gets vote information and compares it to aye nay and abstention patterns with a margin of error
@@ -280,14 +282,24 @@ def toggle_editable():
         entry_link.config(state="normal")
         toggle_button.config(text="✅")  # Checkmark emoji for editable
 
-def addNormalize(PLAYER_DATA_FILE):
-    # Button to trigger analysis
-    analyze_button = tk.Button(root, text="Normalize", command=lambda: analyze_votes_gui(PLAYER_DATA_FILE))
-    analyze_button.grid(row=4, column=2, padx=10, pady=(5, 10))
+def resetDataButton(PLAYER_DATA_FILE):
+    # Reveal the (already-created) "Normalize" button once a sort has been applied
+    normalize_button.config(command=lambda: analyze_votes_gui(PLAYER_DATA_FILE))
+    if not normalize_button.winfo_ismapped():
+        normalize_button.pack(side="left", padx=6)
 
+def voteDeadlineInfo(reddit_link):
+    submission = reddit.submission(url=reddit_link)
+    if submission.selftext.strip():  # Ensure selftext is not empty
+        last_line = submission.selftext.strip().splitlines()[-1]
+    else:
+        last_line = ""  # Handle empty text case
+    print("Last line:", last_line)
+    deadline_label.config(text=last_line)
 
 def analyze_votes_gui(PLAYER_DATA_FILE):
     reddit_link = entry_link.get()  # Get the Reddit link from the input box
+    voteDeadlineInfo(reddit_link)
     toggle_editable()
     # Load player data from the fixed player file
     player_data, vacant_count = load_player_data()
@@ -321,72 +333,98 @@ def open_in_browser(entry_link):
 def main():
     global entry_link,breakdown_box
     global tally_box,window,reddit,root,toggle_button,entry_link
+    global deadline_label, normalize_button
     # Fixed player data file (adjust the file path accordingly)
     config = configparser.ConfigParser()
     files_read = config.read('config/locationOfTxt.ini')
     PLAYER_DATA_FILE = config['player']['playerFile']
-    rootx = tk.Tk()
+
+    rootx = ThemedTk(theme=theme.THEME_NAME)
     rootx.withdraw()  # Hide the root window
-    root = tk.Toplevel()
+    root = tk.Toplevel(rootx)
     root.title("CMHoC Vote Analyzer")
-    logo = tk.PhotoImage(file="logos/logoblue.png")
+    root.geometry("900x650")
+    root.minsize(760, 520)
+    logo = tk.PhotoImage(file="logos/logoblue.png", master=root)
     root.iconphoto(True, logo)
     reddit = fetch_reddit_creds()
+
+    theme.apply_theme(root)
+
     menu_bar = tk.Menu(root)
     root.config(menu=menu_bar)
     drop_menu = tk.Menu(menu_bar, tearoff=0)
     menu_bar.add_cascade(label="File", menu=drop_menu)
     drop_menu.add_command(label="Help", command=lambda: VoteAnalyzerHelpWindow(root))
-    # Input box for Reddit link
-    label_link = tk.Label(root, text="Enter Reddit Link:")
-    label_link.grid(row=0, column=0, padx=10, pady=(10, 0))  # Position the label
 
-    entry_link = tk.Entry(root, width=50)
-    entry_link.grid(row=1, column=0, padx=10, pady=(0, 10))  # Position the entry
+    ttk.Label(root, text="Vote Analyzer", style="Heading.TLabel").pack(anchor="w", padx=16, pady=(14, 0))
+    ttk.Label(
+        root, text=theme.TOOL_DESCRIPTIONS["Vote Analyzer"], style="Subheading.TLabel"
+    ).pack(anchor="w", padx=16, pady=(0, 8))
 
-    # Button to trigger analysis
-    analyze_button = tk.Button(root, text="Analyze Votes", command=lambda:analyze_votes_gui(PLAYER_DATA_FILE))
-    analyze_button.grid(row=2, column=0, padx=10, pady=(0, 10))  # Position the button below the previous button
+    # --- Reddit Thread section ---
+    thread_frame = ttk.LabelFrame(root, text="Reddit Thread", padding=10)
+    thread_frame.pack(fill="x", padx=16, pady=(0, 8))
 
-    # Button to trigger analysis
-    OpenVoteinBrowser = tk.Button(root, text="Open in Browser", command=lambda:open_in_browser(entry_link))
-    OpenVoteinBrowser.grid(row=3, column=0, padx=10, pady=(0, 10))  # Position the button below the previous button
+    ttk.Label(thread_frame, text="Reddit Link:").grid(row=0, column=0, padx=(0, 6), sticky="w")
+    entry_link = ttk.Entry(thread_frame, width=60)
+    entry_link.grid(row=0, column=1, sticky="we")
+    thread_frame.columnconfigure(1, weight=1)
 
+    toggle_button = ttk.Button(thread_frame, text="✅", command=toggle_editable, width=3)
+    toggle_button.grid(row=0, column=2, padx=(6, 0))
 
-    # Text area for displaying the breakdown
-    breakdown_box = scrolledtext.ScrolledText(root, width=80, height=30)
-    breakdown_box.grid(row=5, column=0, padx=10, pady=(5, 10))  # Add padding for spacing
+    button_row = ttk.Frame(thread_frame)
+    button_row.grid(row=1, column=0, columnspan=3, sticky="w", pady=(8, 0))
 
-    # Toggle button to lock/unlock the entry, positioned right next to the link entry
-    toggle_button = tk.Button(root, text="✅", command=toggle_editable, relief="flat")
-    toggle_button.grid(row=0, column=1, padx=2, pady=5, sticky="w")
+    analyze_button = ttk.Button(button_row, text="Analyze Votes", command=lambda: analyze_votes_gui(PLAYER_DATA_FILE))
+    analyze_button.pack(side="left")
 
-    # Text area for displaying the tally
-    tally_box = scrolledtext.ScrolledText(root, width=60, height=20)
-    tally_box.grid(row=6, column=0, padx=10, pady=(5, 10))  # Add padding for spacing
+    OpenVoteinBrowser = ttk.Button(button_row, text="Open in Browser", command=lambda: open_in_browser(entry_link))
+    OpenVoteinBrowser.pack(side="left", padx=6)
 
-    # Button to open recent posts
-    open_posts_button = tk.Button(root, text="Open Recent Posts",
-                                  command=lambda: open_recent_posts_window(root, reddit, entry_link))
-    open_posts_button.grid(row=0, column=2, padx=10, pady=(0, 5))  # Position the button below the entry
+    open_posts_button = ttk.Button(
+        button_row, text="Open Recent Posts", command=lambda: open_recent_posts_window(root, reddit, entry_link)
+    )
+    open_posts_button.pack(side="left", padx=6)
 
-    sort_button = tk.Button(root, text="Sort by Vote Type", command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_by_type(breakdown_box)))
-    sort_button.grid(row=1, column=2, padx=10, pady=(5, 10))  # Add padding for spacing
+    deadline_label = ttk.Label(thread_frame, text="")
+    deadline_label.grid(row=2, column=0, columnspan=3, sticky="w", pady=(6, 0))
 
-    sort_party_button = tk.Button(root, text="Sort by Party Affiliation", command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_by_party(breakdown_box)))
-    sort_party_button.grid(row=2, column=2, padx=10, pady=(5, 10))
+    # --- Sort toolbar ---
+    sort_frame = ttk.Frame(root)
+    sort_frame.pack(fill="x", padx=16, pady=(0, 8))
 
-    sort_govPosition_button = tk.Button(root, text="Sort by Gov Position",
-                                  command=lambda: (addNormalize(PLAYER_DATA_FILE), sort_by_govPosition(breakdown_box)))
-    sort_govPosition_button.grid(row=3, column=2, padx=10, pady=(5, 10))
+    ttk.Label(sort_frame, text="Sort by:").pack(side="left", padx=(0, 6))
+    sort_button = ttk.Button(sort_frame, text="Vote Type", command=lambda: (resetDataButton(PLAYER_DATA_FILE), sort_by_type(breakdown_box)))
+    sort_button.pack(side="left")
+    sort_party_button = ttk.Button(sort_frame, text="Party Affiliation", command=lambda: (resetDataButton(PLAYER_DATA_FILE), sort_by_party(breakdown_box)))
+    sort_party_button.pack(side="left", padx=6)
+    sort_govPosition_button = ttk.Button(sort_frame, text="Gov Position", command=lambda: (resetDataButton(PLAYER_DATA_FILE), sort_by_govPosition(breakdown_box)))
+    sort_govPosition_button.pack(side="left")
+
+    # Created hidden; resetDataButton() reveals it once a sort has been applied.
+    normalize_button = ttk.Button(sort_frame, text="Normalize")
+
+    # --- Breakdown / Tally panes ---
+    panes = ttk.PanedWindow(root, orient=tk.HORIZONTAL)
+    panes.pack(fill="both", expand=True, padx=16, pady=(0, 12))
+
+    breakdown_frame = ttk.LabelFrame(panes, text="Vote Breakdown", padding=8)
+    tally_frame = ttk.LabelFrame(panes, text="Tally", padding=8)
+    panes.add(breakdown_frame, weight=3)
+    panes.add(tally_frame, weight=2)
+
+    breakdown_box = scrolledtext.ScrolledText(breakdown_frame, wrap=tk.WORD)
+    breakdown_box.pack(fill="both", expand=True)
+
+    tally_box = scrolledtext.ScrolledText(tally_frame, wrap=tk.WORD)
+    tally_box.pack(fill="both", expand=True)
 
     # Define tag styles for highlighting
-    breakdown_box.tag_config('green_bg', background='lightgreen')
-    breakdown_box.tag_config('red_bg', background='lightcoral')
-    breakdown_box.tag_config('yellow_bg', background='lightyellow')
-    breakdown_box.tag_config('no_vote_bg', background='lightgray')
+    theme.configure_vote_tags(breakdown_box)
 
-    root.mainloop()
+    rootx.mainloop()
 
 if __name__ == "__main__":
     main()

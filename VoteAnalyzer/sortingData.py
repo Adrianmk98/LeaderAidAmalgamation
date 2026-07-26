@@ -1,6 +1,8 @@
 import tkinter as tk
 import regex as re
 
+from dropDown.theme import configure_vote_tags
+
 original_lines = []
 def load_original_lines(breakdown_box):
     global original_lines
@@ -57,13 +59,10 @@ def sort_by_party(breakdown_box):
     breakdown_box.config(state=tk.NORMAL)
     breakdown_box.delete(1.0, tk.END)
 
+    configure_vote_tags(breakdown_box)
+
     previous_party = None
     for line_text, party, vote_type in sorted_lines:
-        breakdown_box.tag_config('graybox', background='lightgray')
-        breakdown_box.tag_configure('green_bg', background='lightgreen')
-        breakdown_box.tag_configure('red_bg', background='lightcoral')
-        breakdown_box.tag_configure('yellow_bg', background='lightyellow')
-
         if party != previous_party:
             if previous_party is not None:  # Don't insert a line before the first party
                 breakdown_box.insert(tk.END, "-" * 80 + "\n",'graybox')  # Insert separator line
@@ -114,13 +113,11 @@ def sort_by_govPosition(breakdown_box):
     breakdown_box.config(state=tk.NORMAL)
     breakdown_box.delete(1.0, tk.END)
 
+    configure_vote_tags(breakdown_box)
+
     previous_party = None
     for line_text, party, vote_type in sorted_lines:
         # Insert a line separator if the party changes
-        breakdown_box.tag_config('graybox', background='lightgray')
-        breakdown_box.tag_configure('green_bg', background='lightgreen')
-        breakdown_box.tag_configure('red_bg', background='lightcoral')
-        breakdown_box.tag_configure('yellow_bg', background='lightyellow')
         if party != previous_party:
             if previous_party is not None:  # Don't insert a line before the first party
                 breakdown_box.insert(tk.END, "-" * 80 + "\n",'graybox')  # Insert separator line
@@ -153,10 +150,6 @@ def sort_by_type(breakdown_box):
     aye_pattern = re.compile(r'\b(aye|oui|yea|pour|yes|yep|affirmative)\b', re.IGNORECASE)
     nay_pattern = re.compile(r'\b(nay|non|contre|no|nope|negative)\b', re.IGNORECASE)
     abstain_pattern = re.compile(r'\b(abstain|abstention|withhold|pass)\b', re.IGNORECASE)
-    breakdown_box.tag_configure('green_bg', background='lightgreen')
-    breakdown_box.tag_configure('red_bg', background='lightcoral')
-    breakdown_box.tag_configure('yellow_bg', background='lightyellow')
-    breakdown_box.tag_config('graybox', background='lightgray')
     # Ensure original_lines is available
     if not original_lines:
         load_original_lines(breakdown_box)  # Load original lines if they are not available
@@ -182,6 +175,7 @@ def sort_by_type(breakdown_box):
     # Clear the breakdown box and prepare for categorized output
     breakdown_box.config(state=tk.NORMAL)
     breakdown_box.delete(1.0, tk.END)
+    configure_vote_tags(breakdown_box)
 
     # Separate lines by vote type
     for vote_type in ['Aye', 'Nay', 'Abstain', 'No Vote']:
@@ -207,3 +201,4 @@ def sort_by_type(breakdown_box):
             breakdown_box.insert(tk.END, "-" * 80 + "\n",'graybox')
 
     breakdown_box.config(state=tk.DISABLED)
+

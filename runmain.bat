@@ -20,23 +20,17 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
-:: Install PRAW using pip
-echo Installing PRAW...
-pip install praw
-echo Installing tkcalendar
-pip install tkcalendar
-echo Installing pyperclip
-pip install pyperclip
-echo Installing ttkthemes
-pip install ttkthemes
+:: Install dependencies from requirements.txt
+echo Installing dependencies...
+pip install -r requirements.txt
 
 :: Check if PRAW was installed successfully
 pip show praw >nul 2>&1
 if %ERRORLEVEL% neq 0 (
-    echo Failed to install PRAW. Please check your Python and pip installations.
+    echo Failed to install dependencies. Please check your Python and pip installations.
     exit /b 1
 ) else (
-    echo PRAW installed successfully.
+    echo Dependencies installed successfully.
 )
 
 :: Run Main.py
